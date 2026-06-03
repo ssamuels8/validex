@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import HeroSceneLoader from './HeroSceneLoader';
 
 export default function Hero() {
   return (
@@ -23,16 +23,9 @@ export default function Hero() {
           </a>
         </div>
 
-        {/* Right — floating image */}
-        <div className="hero-image-wrap">
-          <Image
-            src="/hero-object.jpg"
-            alt="Validex — sustainability measurement"
-            fill
-            priority
-            sizes="(max-width: 900px) 100vw, 45vw"
-            style={{ objectFit: 'contain' }}
-          />
+        {/* Right — Blender 3D object, drag to spin */}
+        <div className="hero-image-wrap" style={{ cursor: 'grab' }}>
+          <HeroSceneLoader />
         </div>
       </div>
     </section>
