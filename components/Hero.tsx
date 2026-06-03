@@ -1,18 +1,28 @@
+import HeroSceneLoader from './HeroSceneLoader';
+
 export default function Hero() {
   return (
     <section className="hero" id="hero">
       <div className="grain-overlay" aria-hidden="true" />
-      <div className="hero-glow" aria-hidden="true" />
+
+      {/* 3D scene fills the background */}
+      <div className="hero-scene-wrap" aria-hidden="true">
+        <HeroSceneLoader />
+      </div>
+
       <div className="hero-content">
+        <span className="hero-eyebrow-top mono">
+          Sustainability Measurement Infrastructure
+        </span>
         <h1 className="hero-headline display">
           <span className="hero-line">
             <span className="word-outer"><span className="word-inner">The</span></span>{' '}
             <span className="word-outer"><span className="word-inner">market</span></span>{' '}
             <span className="word-outer"><span className="word-inner">has</span></span>{' '}
-            <span className="word-outer"><span className="word-inner">$35</span></span>{' '}
-            <span className="word-outer"><span className="word-inner">trillion</span></span>
+            <span className="word-outer"><span className="word-inner">$35</span></span>
           </span>
           <span className="hero-line">
+            <span className="word-outer"><span className="word-inner">trillion</span></span>{' '}
             <span className="word-outer"><span className="word-inner">in</span></span>{' '}
             <span className="word-outer"><span className="word-inner">answers.</span></span>
           </span>
@@ -28,8 +38,8 @@ export default function Hero() {
           Validex is building the measurement system that should have existed from the start.
         </p>
       </div>
+
       <div className="hero-bottom">
-        <span className="hero-eyebrow mono">§ 01 — Sustainability Measurement Infrastructure</span>
         <div className="scroll-indicator" aria-hidden="true">
           <span className="scroll-label mono">Scroll</span>
           <span className="scroll-arrow">↓</span>

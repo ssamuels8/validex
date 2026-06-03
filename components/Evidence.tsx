@@ -45,11 +45,21 @@ export default function Evidence() {
         </p>
       </div>
 
-      <div className="evidence-sticky-outer" id="evidence-sticky-outer">
+      {/* overflow:hidden on sticky-outer prevents ghost names from bleeding */}
+      <div
+        className="evidence-sticky-outer"
+        id="evidence-sticky-outer"
+        style={{ overflow: 'hidden' }}
+      >
         <div className="evidence-sticky" id="evidence-sticky">
           <div className="evidence-panels" id="evidence-panels">
             {PANELS.map((p) => (
-              <div className="evidence-panel" key={p.index}>
+              <div
+                className="evidence-panel"
+                key={p.index}
+                style={{ overflow: 'hidden' }}
+              >
+                {/* Ghost clipped inside the panel */}
                 <div className="panel-ghost" aria-hidden="true">
                   {p.company}
                 </div>
