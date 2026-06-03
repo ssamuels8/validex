@@ -134,29 +134,30 @@ export default function SiteScripts() {
         });
       }
 
-      // ── Case studies horizontal scroll ───────────────────────
-      if (window.innerWidth >= 768 && !prefersReduced) {
-        const csSection = document.getElementById('case-studies');
-        const csTrack = document.getElementById('cs-track');
-        const csFill = document.getElementById('cs-progress-fill');
-        if (csSection && csTrack) {
+      // ── Case study cards stagger reveal ────────────────────────
+      if (!prefersReduced) {
+        const cards = document.querySelectorAll<HTMLElement>('.cs-card');
+        cards.forEach((card, i) => {
+          gsap.set(card, { opacity: 0, y: 32 });
           ScrollTrigger.create({
-            trigger: csSection,
-            start: 'top top',
-            end: () => `+=${csTrack.scrollWidth - window.innerWidth}`,
-            scrub: 0.8,
-            pin: true,
-            anticipatePin: 1,
-            invalidateOnRefresh: true,
-            animation: gsap.to(csTrack, {
-              x: () => -(csTrack.scrollWidth - window.innerWidth),
-              ease: 'none',
-            }),
-            onUpdate(self: { progress: number }) {
-              if (csFill) csFill.style.transform = `scaleX(${self.progress})`;
+            trigger: card,
+            start: 'top 88%',
+            onEnter: () => {
+              gsap.to(card, {
+                opacity: 1,
+                y: 0,
+                duration: 0.7,
+                delay: (i % 2) * 0.1,
+                ease: 'power3.out',
+              });
             },
           });
-        }
+        });
+      } else {
+        document.querySelectorAll<HTMLElement>('.cs-card').forEach((c) => {
+          c.style.opacity = '1';
+          c.style.transform = 'none';
+        });
       }
 
       // ── System diagram: lines draw + nodes fade ───────────────
@@ -181,7 +182,7 @@ export default function SiteScripts() {
         diagNodes.forEach((node, i) => {
           const line = diagLines[i];
           node.addEventListener('mouseenter', () => {
-            if (line) line.style.stroke = 'var(--accent)';
+            if (line) line.style.stroke = 'var(--moss)';
           });
           node.addEventListener('mouseleave', () => {
             if (line) line.style.stroke = '';

@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { DM_Sans } from 'next/font/google';
+import { DM_Sans, DM_Mono } from 'next/font/google';
 import './globals.css';
 
 const dmSans = DM_Sans({
@@ -9,10 +9,17 @@ const dmSans = DM_Sans({
   display: 'swap',
 });
 
-const faviconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" fill="#F8F6F1"/><text x="5" y="24" font-family="sans-serif" font-size="20" font-weight="700" fill="#0D0D0D">V</text><circle cx="26" cy="10" r="4" fill="#2A6B4A"/></svg>`;
+const dmMono = DM_Mono({
+  subsets: ['latin'],
+  weight: ['400', '500'],
+  variable: '--font-mono',
+  display: 'swap',
+});
+
+const faviconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" fill="#F2EEE4"/><text x="5" y="24" font-family="sans-serif" font-size="20" font-weight="700" fill="#15130E">V</text><circle cx="26" cy="10" r="4" fill="#2E5E3E"/></svg>`;
 
 export const viewport: Viewport = {
-  themeColor: '#F8F6F1',
+  themeColor: '#F2EEE4',
 };
 
 export const metadata: Metadata = {
@@ -46,7 +53,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={dmSans.variable}>
+    <html lang="en" className={`${dmSans.variable} ${dmMono.variable}`}>
       <body>{children}</body>
     </html>
   );
