@@ -315,8 +315,8 @@ export default function SiteScripts() {
             const p = self.progress;
             if (imgWrap) gsap.set(imgWrap, { y: -120 * p, opacity: 1 - p * 0.7 });
             if (heroText) gsap.set(heroText, { y: -55 * p });
-            // Per-line parallax — "Proof," fastest, "Promise." slowest = layered depth
-            const lineRates = [-40, -25, -10];
+            // Per-line parallax — "Measure" fastest, "Promise." slowest = layered depth
+            const lineRates = [-45, -32, -20, -10];
             lineMasks.forEach((mask, i) => {
               gsap.set(mask, { y: lineRates[i] * p });
             });
@@ -360,21 +360,11 @@ export default function SiteScripts() {
       if (prefersReduced) {
         words.forEach((w) => { w.style.transform = 'none'; });
         if (pill) pill.style.opacity = '1';
-        // On desktop, vertically center the object via GSAP yPercent since CSS transform is removed
-        if (imgWrap) {
-          const isMobile = window.innerWidth <= 900;
-          gsap.set(imgWrap, { opacity: 1, ...(isMobile ? {} : { yPercent: -50 }) });
-        }
+        if (imgWrap) gsap.set(imgWrap, { opacity: 1 });
         if (heroSub) heroSub.style.opacity = '1';
         if (scrollCue) scrollCue.style.opacity = '1';
         if (headline) headline.classList.add('revealed');
         return;
-      }
-
-      // Desktop: set yPercent -50 so GSAP controls vertical centering instead of CSS
-      const isMobile = window.innerWidth <= 900;
-      if (imgWrap && !isMobile) {
-        gsap.set(imgWrap, { yPercent: -50 });
       }
 
       // t=0.0 — eyebrow pill
@@ -387,15 +377,15 @@ export default function SiteScripts() {
       words.forEach((w, i) => {
         gsap.to(w, { y: 0, duration: 1.0, delay: 0.15 + i * 0.12, ease: 'power4.out' });
       });
-      // Mark headline revealed after all lines finish (last line: 0.15+0.24+1.0 ≈ 1.4s)
-      setTimeout(() => headline?.classList.add('revealed'), 1450);
+      // Mark headline revealed after all lines finish (last line: 0.15+0.36+1.0 ≈ 1.5s)
+      setTimeout(() => headline?.classList.add('revealed'), 1550);
 
-      // t=0.40 — object enters from right/below
+      // t=0.40 — object rises from below (CSS calc handles centering, GSAP only does y/scale/opacity)
       if (imgWrap) gsap.fromTo(imgWrap,
         { y: 70, scale: 0.95, opacity: 0 },
         {
           y: 0, scale: 1, opacity: 1,
-          duration: 1.5, delay: 0.40,
+          duration: 1.6, delay: 0.40,
           ease: 'power3.out',
           clearProps: 'scale',
         }

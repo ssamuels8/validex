@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { DM_Sans, DM_Mono } from 'next/font/google';
+import { DM_Sans, DM_Mono, Bricolage_Grotesque } from 'next/font/google';
 import './globals.css';
 
 const dmSans = DM_Sans({
@@ -13,6 +13,13 @@ const dmMono = DM_Mono({
   subsets: ['latin'],
   weight: ['400', '500'],
   variable: '--font-mono',
+  display: 'swap',
+});
+
+const bricolage = Bricolage_Grotesque({
+  subsets: ['latin'],
+  weight: ['700', '800'],
+  variable: '--font-display',
   display: 'swap',
 });
 
@@ -53,7 +60,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${dmSans.variable} ${dmMono.variable}`}>
+    <html lang="en" className={`${dmSans.variable} ${dmMono.variable} ${bricolage.variable}`}>
       <body>{children}</body>
     </html>
   );

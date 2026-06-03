@@ -4,6 +4,9 @@
 html, body, * {
   font-family: var(--font-main), 'DM Sans', ui-sans-serif, system-ui, sans-serif !important;
 }
+.display {
+  font-family: var(--font-display), 'Bricolage Grotesque', ui-sans-serif, sans-serif !important;
+}
 .mono, [class*="-eyebrow"], [class*="-idx"], [class*="-tag"],
 [class*="-label"]:not(.diagram-label):not(.grade-label-skip),
 [class*="scorecard-head"], [class*="scorecard-foot"],
@@ -184,13 +187,13 @@ h1, h2, h3, h4, h5, h6 {
   pointer-events: none;
 }
 
-/* Object — right side, vertically centered, bleeds off right edge */
+/* Object — centered via calc so GSAP only needs to animate y/opacity/scale */
 .hero-image-wrap {
   position: absolute;
-  right: -4%;
-  top: 50%;
-  /* No CSS transform — GSAP sets yPercent: -50 to center vertically */
-  width: clamp(820px, 58vw, 1500px);
+  left: calc(50% - clamp(450px, 39vw, 825px));
+  top: calc(54% - clamp(253px, 21.9vw, 465px));
+  right: auto;
+  width: clamp(900px, 78vw, 1650px);
   z-index: 1;
   pointer-events: none;
   user-select: none;
@@ -219,7 +222,7 @@ h1, h2, h3, h4, h5, h6 {
   display: block;
   width: 100%;
   height: auto;
-  filter: drop-shadow(0 50px 90px rgba(21,19,14,0.16));
+  filter: drop-shadow(0 50px 100px rgba(21,19,14,0.18));
   animation: heroFloat 7s ease-in-out infinite;
   will-change: transform;
 }
@@ -228,12 +231,11 @@ h1, h2, h3, h4, h5, h6 {
   50%       { transform: translateY(-16px); }
 }
 
-/* Text — left column, vertically centered */
+/* Text — top-left, anchored ~20vh from top, overlaps object upper-left */
 .hero-text {
   position: absolute;
-  top: 50%;
+  top: 20vh;
   left: 0;
-  transform: translateY(-50%);
   z-index: 2;
   display: flex;
   flex-direction: column;
@@ -241,7 +243,7 @@ h1, h2, h3, h4, h5, h6 {
   text-align: left;
   padding-left: clamp(2rem, 6vw, 7rem);
   padding-right: 2rem;
-  max-width: 52vw;
+  max-width: 68vw;
 }
 .hero-pill {
   display: inline-block;
@@ -258,10 +260,10 @@ h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-mono), 'DM Mono', monospace !important;
 }
 .hero-headline {
-  font-size: clamp(3.5rem, 8vw, 9rem);
-  font-weight: 700;
-  line-height: 0.92;
-  letter-spacing: -0.04em;
+  font-size: clamp(3.5rem, 8.5vw, 9.5rem);
+  font-weight: 800;
+  line-height: 0.9;
+  letter-spacing: -0.03em;
   color: var(--ink);
   margin-bottom: 1.5rem;
   font-feature-settings: "ss01", "cv01";
@@ -274,7 +276,7 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 400;
   line-height: 1.6;
   color: var(--on-light);
-  max-width: 32ch;
+  max-width: 30ch;
   opacity: 0;
 }
 
@@ -1266,17 +1268,19 @@ h1, h2, h3, h4, h5, h6 {
   .hero { min-height: 100svh; height: auto; overflow: hidden; }
   .hero-text {
     position: static;
-    transform: none;
+    top: auto;
     max-width: 100%;
     padding: clamp(5rem, 14vh, 8rem) 1.75rem 2.5rem;
     align-items: flex-start;
   }
   .hero-image-wrap {
     position: static;
+    left: auto;
     right: auto;
     top: auto;
-    width: 95vw;
+    width: 100vw;
     margin: 0 auto;
+    transform: none;
     opacity: 0; /* still hidden until GSAP reveals */
   }
   .hero-scroll-cue-wrap {
