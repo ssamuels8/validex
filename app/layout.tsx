@@ -1,24 +1,25 @@
 import type { Metadata, Viewport } from 'next';
-import { Cormorant_Garamond, Geist, Geist_Mono } from 'next/font/google';
+import { Syne, Barlow, Barlow_Condensed } from 'next/font/google';
 import './globals.css';
 
-const cormorant = Cormorant_Garamond({
+const syne = Syne({
   subsets: ['latin'],
-  weight: ['400', '600', '700'],
-  style: ['normal', 'italic'],
+  weight: ['700', '800'],
   variable: '--font-display',
   display: 'swap',
 });
 
-const geist = Geist({
+const barlow = Barlow({
   subsets: ['latin'],
+  weight: ['300', '400', '500', '600'],
   variable: '--font-sans',
   display: 'swap',
 });
 
-const geistMono = Geist_Mono({
+const barlowCondensed = Barlow_Condensed({
   subsets: ['latin'],
-  variable: '--font-mono',
+  weight: ['300', '400', '500', '600', '700'],
+  variable: '--font-condensed',
   display: 'swap',
 });
 
@@ -61,7 +62,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${cormorant.variable} ${geist.variable} ${geistMono.variable}`}
+      className={`${syne.variable} ${barlow.variable} ${barlowCondensed.variable}`}
     >
       <body>{children}</body>
     </html>
