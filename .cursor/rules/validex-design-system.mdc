@@ -1,0 +1,252 @@
+---
+description: Validex design system — palette, typography, motion, component patterns. Apply to all UI work in this repo.
+globs: **/*.tsx, **/*.ts, **/*.css
+alwaysApply: true
+---
+
+# Validex Design System
+
+## Stack
+Next.js 16 · App Router · Tailwind v4 · TypeScript · GSAP + Lenis · `next/font/google`
+
+---
+
+## Colour Tokens (globals.css :root)
+
+| Token | Value | Use |
+|-------|-------|-----|
+| `--paper` | `#F2EEE4` | Primary background (warm bone) |
+| `--paper-deep` | `#E7E1D3` | Alt light surface, cards on light bg |
+| `--ink` | `#15130E` | Primary text, dark section bg |
+| `--ink-soft` | `#232019` | Dark card surfaces, scorecard bg |
+| `--moss` | `#2E5E3E` | Primary accent — use SPARINGLY |
+| `--moss-bright` | `#4A8A5E` | Hover / active states only |
+| `--on-dark` | `rgba(242,238,228,0.62)` | Body text on dark sections |
+| `--on-light` | `rgba(21,19,14,0.60)` | Body text on light sections |
+| `--line-dark` | `rgba(242,238,228,0.12)` | Borders / dividers on dark bg |
+| `--line-light` | `rgba(21,19,14,0.10)` | Borders / dividers on light bg |
+
+**Never use** raw hex values for colours — always use tokens via `var(--token)`.
+**Never use** pure `#000000` or `#ffffff` — use `var(--ink)` and `var(--paper)`.
+**`--moss` accent** — one prominent use per section maximum.
+
+---
+
+## Typography
+
+### Fonts
+- **DM Sans** (`var(--font-main)`) — all display, headings, body copy
+- **DM Mono** (`var(--font-mono)`) — eyebrows, labels, index numbers, tags, meta, scorecard rows, footer
+
+Both loaded via `next/font/google` in `app/layout.tsx` with CSS variables. Never import fonts elsewhere.
+
+### Type Scale
+```css
+--h1:   clamp(4rem, 11vw, 12rem)   /* weight 500, tracking -0.035em, lh 0.92 */
+--h2:   clamp(2.5rem, 6vw, 5.5rem) /* weight 500, tracking -0.03em,  lh 0.98 */
+--stat: clamp(7rem, 18vw, 19rem)   /* weight 500, tracking -0.04em,  lh 0.85 */
+--body: 1.0625rem                  /* weight 400, lh 1.6 */
+```
+
+### Eyebrow / Label Pattern (mono)
+```tsx
+<span className="who-eyebrow">§ 01 — Who We Are</span>
+// font-family: var(--font-mono), size 0.72rem, tracking 0.16em, uppercase, color var(--moss)
+```
+
+### Display Headlines
+```tsx
+// Apply these to all h1/h2:
+font-feature-settings: "ss01", "cv01";
+text-rendering: optimizeLegibility;
+font-weight: 500; // NOT 700 at large scale
+```
+
+---
+
+## Section Alternation
+
+Light → Dark → Light → Dark → Light → Dark → Light
+
+| Section | Background |
+|---------|------------|
+| Hero | `var(--paper)` |
+| Manifesto | `var(--paper)` + `border-top: 1px solid var(--line-light)` |
+| Who We Are | `radial-gradient(ellipse at 50% 35%, var(--ink-soft) 0%, var(--ink) 65%)` |
+| The Problem | `var(--paper)` |
+| Case Studies | `radial-gradient(ellipse at 50% 30%, var(--ink-soft) 0%, var(--ink) 60%)` |
+| System | `var(--paper)` |
+| Score | `radial-gradient(ellipse at 50% 35%, var(--ink-soft) 0%, var(--ink) 65%)` |
+| CTA | `radial-gradient(ellipse at 50% 40%, #F6F2E9 0%, var(--paper) 65%)` |
+| Footer | `var(--ink)` + `border-top: 1px solid var(--line-dark)` |
+
+Every section boundary gets a 1px hairline: `var(--line-light)` on light, `var(--line-dark)` on dark.
+
+---
+
+## Motion System
+
+### Lenis + GSAP (loaded in `components/SiteScripts.tsx`)
+- Smooth scroll: Lenis `lerp: 0.1`
+- All GSAP animations via `ScrollTrigger`, trigger at `top 85%`
+- Respect `prefers-reduced-motion` — skip all animations if set
+
+### Line-Mask Reveal (headlines)
+```tsx
+// HTML structure:
+<h1 className="hero-headline">
+  <span className="line-mask"><span className="line-mask-inner">Word</span></span>
+</h1>
+// CSS: .line-mask { overflow: hidden } .line-mask-inner { transform: translateY(102%) }
+// GSAP: animate .line-mask-inner y → 0, power4.out, 1s, stagger 0.12s
+```
+
+### .reveal (scroll sections)
+```tsx
+// Add className="reveal" to headings, paragraphs, key elements
+// CSS: opacity: 0; transform: translateY(40px)
+// GSAP ScrollTrigger animates to opacity: 1, y: 0, power3.out, 0.9s
+```
+
+### Easing Cheatsheet
+| Use | Ease |
+|-----|------|
+| Headline reveals | `power4.out` |
+| General reveals | `power3.out` |
+| Preloader slide | `power4.inOut` |
+| Magnetic snap-back | `elastic.out(1, 0.4)` |
+| Parallax / scrub | `none` |
+
+### Magnetic Buttons
+Applied to `#hero-cta-btn` and `#cta-main-btn`. Do not add to other elements without adding the GSAP handler in SiteScripts.
+
+---
+
+## Component Patterns
+
+### Eyebrow + Headline + Sub (section opener)
+```tsx
+<span className="who-eyebrow reveal">§ 01 — Who We Are</span>
+<h2 className="who-headline reveal">Headline copy here.</h2>
+<p className="who-cols reveal">Body copy…</p>
+```
+
+### CTA Pill
+```tsx
+<a href="mailto:hello@validex.com" className="hero-cta" id="hero-cta-btn">
+  Get In Touch ↗
+</a>
+// bg: var(--ink), color: var(--paper), border-radius: 999px
+// hover: bg var(--moss)
+// font-family: var(--font-mono), 0.7rem, tracking 0.14em, uppercase
+```
+
+### Case Study Card
+```tsx
+<a href="/case-studies/slug" className="cs-card reveal">
+  <div className="cs-card-top">
+    <span className="cs-card-idx">01</span>
+    <span className="cs-card-cat">EMISSIONS</span>
+  </div>
+  <div className="cs-card-mid">
+    <div className="cs-card-company">Volkswagen</div>
+    <div className="cs-card-claim">"Rated AA."</div>
+    <div className="cs-card-reality">11 million cars cheating.</div>
+  </div>
+  <div className="cs-card-bot">
+    <span className="cs-card-link">Read case study →</span>
+  </div>
+</a>
+// Surface: var(--ink-soft), border: 1px var(--line-dark), border-radius: 4px
+// Hover: border-color var(--moss), translateY(-4px)
+```
+
+### Case Study Detail Page
+```tsx
+<main className="cs-page">           {/* dark radial gradient bg */}
+  <div className="cs-page-inner">    {/* max-width: 720px, centered */}
+    <a href="/#case-studies" className="cs-back">← All cases</a>
+    <span className="cs-category">CATEGORY · CONTEXT · YEAR</span>
+    <h1 className="cs-title">Title</h1>
+    <p className="cs-standfirst">One-sentence summary.</p>
+    <div className="cs-body">…paragraphs…</div>
+    <blockquote className="cs-pull-quote">Key quote.</blockquote>
+    <div className="cs-callout">
+      <span className="cs-callout-tag">What Validex Measures Instead</span>
+      <p>Component description.</p>
+    </div>
+    <nav className="cs-nav">…prev/next…</nav>
+    <div className="cs-cta">…email CTA…</div>
+  </div>
+</main>
+```
+
+---
+
+## Hero Composition
+
+- Image: `next/image` src `/hero-object.jpg`, `width=820 height=680 priority`
+- Container: `.hero-image-wrap` — `position: absolute; bottom: 0; width: min(62vw, 880px)`
+- Blend: `mix-blend-mode: multiply` on the `<img>` — dissolves grey bg into bone
+- Tilt wrapper: `.hero-image-tilt` (GSAP rotateX/Y on mousemove ±4°)
+- Float: CSS `@keyframes heroFloat` (translateY 0→-18px, 7s infinite)
+- Parallax: GSAP ScrollTrigger scrub on `#hero-image-wrap` (y: 0 → -120)
+- Headline z-index above image: `.hero-text` z-index 2, `.hero-image-wrap` z-index 1
+
+---
+
+## SVG System Diagram
+
+10 component nodes + center "VALIDEX SCORE" in a radial layout (r=180, cx/cy=300).
+Node classes: `.diagram-node` (animates in on scroll), `.diagram-line` (stroke-dashoffset draw).
+Do not replace with third-party chart lib — user will supply a custom diagram component separately.
+
+---
+
+## Accessibility
+
+- All `<Image>` tags must have descriptive `alt` text
+- `prefers-reduced-motion`: SiteScripts checks at init — skip all GSAP if true, set `opacity: 1; transform: none` on `.reveal` elements
+- Nav uses `mix-blend-mode: difference` — ensure link text remains legible on all bg colours
+- Focus states: Tailwind default ring is fine; do not remove outline
+
+---
+
+## File Structure
+
+```
+app/
+  globals.css          ← ALL styles. No component-level CSS files.
+  layout.tsx           ← Font imports (DM Sans + DM Mono), metadata
+  page.tsx             ← Section composition (import order = render order)
+  case-studies/[slug]/ ← Editorial detail pages (7 static slugs)
+components/
+  Preloader.tsx        ← #preloader overlay (animated by SiteScripts)
+  Nav.tsx              ← Fixed, mix-blend-mode difference
+  Hero.tsx             ← 'use client', next/image, line-mask headline
+  Manifesto.tsx        ← Word-by-word reveal
+  WhoWeAre.tsx         ← Dark section, two-col body
+  TheProblem.tsx       ← 85% stat counter (GSAP), pull quote
+  CaseStudies.tsx      ← Card grid (7 cards), .cs-grid-section
+  System.tsx           ← SVG radial diagram
+  Score.tsx            ← Animated scorecard, bar fills, grade scale-in
+  CtaSection.tsx       ← line-mask headline, magnetic CTA
+  Footer.tsx           ← Dark, thin bar
+  SiteScripts.tsx      ← 'use client', ALL GSAP/Lenis logic
+public/
+  hero-object.jpg      ← Hero image (replace with hero-reference.jpg when available)
+```
+
+---
+
+## Don'ts
+
+- No `font-weight: 700` on display headlines — use `500`
+- No pure `#000` or `#fff` — use tokens
+- No `overflow: hidden` on `.cta-headline` (breaks descender visibility)
+- No inline `style={{ fontFamily: '...' }}` — use CSS classes
+- No new animation logic in component files — all GSAP lives in `SiteScripts.tsx`
+- No horizontal scroll on new sections — use card grids or vertical stacks
+- No extra 100vh spacers or empty divs
+- No serif fonts anywhere — DM Sans and DM Mono only
+- No emojis as UI icons — use SVG or text symbols (→ ↗ ←)
