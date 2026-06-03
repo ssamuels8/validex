@@ -10,13 +10,9 @@ export default function Score() {
   return (
     <section className="score" id="score">
       <div className="score-inner">
-        <span className="section-label">The Score</span>
-        <h2 className="score-headline">
-          This is what verification looks like.
-        </h2>
-        <p className="score-sub">
-          Two grades. Both always disclosed. Neither can be hidden.
-        </p>
+        <span className="score-eyebrow">The Score</span>
+        <h2 className="score-headline">This is what verification looks like.</h2>
+        <p className="score-sub">Two grades. Both always disclosed. Neither can be hidden.</p>
 
         <div className="scorecard-wrapper" id="scorecard-wrapper">
           <svg className="scorecard-svg-border" aria-hidden="true" id="scorecard-svg">
@@ -39,9 +35,7 @@ export default function Score() {
             <div className="scorecard-body">
               <div className="sc-company sc-reveal" data-delay="200">
                 <div className="company-name">Illustrative Company GmbH</div>
-                <div className="company-sector">
-                  Industrial Manufacturing · EU · ESRS-Aligned
-                </div>
+                <div className="company-sector">Industrial Manufacturing · EU · ESRS-Aligned</div>
               </div>
               <div className="sc-grades">
                 <div
@@ -50,7 +44,7 @@ export default function Score() {
                   data-tip="Above threshold. Below sector leader."
                 >
                   <div className="grade-label">Absolute Grade</div>
-                  <div className="grade-letter">B</div>
+                  <div className="grade-letter" style={{ opacity: 0 }}>B</div>
                   <div className="grade-meta">Full universe</div>
                   <div className="grade-meta">2,847 companies</div>
                 </div>
@@ -60,7 +54,7 @@ export default function Score() {
                   data-tip="Ranked 1st in Industrial Manufacturing sector."
                 >
                   <div className="grade-label">Sector-Relative</div>
-                  <div className="grade-letter accent">A</div>
+                  <div className="grade-letter accent" style={{ opacity: 0 }}>A</div>
                   <div className="grade-meta">Rank: 1 / 112</div>
                   <div className="grade-meta">Industrial sector</div>
                 </div>

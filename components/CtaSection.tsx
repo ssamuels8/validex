@@ -2,18 +2,17 @@ export default function CtaSection() {
   return (
     <section className="cta-section" id="contact">
       <div className="cta-inner">
-        <span className="section-label" style={{ color: 'var(--green)' }}>
-          Get In Touch
-        </span>
-        <h2 className="cta-headline">
-          Start<br />Measuring.
-        </h2>
+        <span className="cta-eyebrow">Get In Touch</span>
+        <h1 className="cta-headline">
+          <span className="line-mask"><span className="line-mask-inner">Start</span></span>
+          <span className="line-mask"><span className="line-mask-inner">Measuring.</span></span>
+        </h1>
         <p className="cta-sub">
-          We are onboarding a small number of partners.<br />
+          We are onboarding a small number of partners.
           No forms. Just a conversation.
         </p>
-        <a href="mailto:hello@validex.com" className="hero-btn">
-          hello@validex.com ↗
+        <a href="mailto:hello@validex.com" className="cta-btn" id="cta-main-btn">
+          HELLO@VALIDEX.COM ↗
         </a>
       </div>
     </section>

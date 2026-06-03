@@ -1,129 +1,76 @@
-'use client';
-
-import { useEffect, useRef, useState } from 'react';
-
-interface Case {
-  slug: string;
-  company: string;
-  stat: string;
-  body: string;
-  tag: string;
-  component: string;
-}
-
-const CASES: Case[] = [
+const CASES = [
   {
     slug: 'volkswagen',
     company: 'Volkswagen',
-    stat: 'AA Rating',
-    body: 'While 11 million vehicles were actively falsifying emissions tests. The score said safe. The reality did not.',
-    tag: 'Emissions Component',
-    component: 'EMISSIONS — Scope 1 independent verification',
+    claim: 'Rated AA.',
+    reality: '11 million cars cheating emissions.',
+    context: 'DJSI ranked them first among global automakers. 11 million defeat devices were already installed.',
+    tag: '→ EMISSIONS',
   },
   {
     slug: 'dws',
     company: 'DWS',
-    stat: '€900bn',
-    body: 'Marketed as ESG-integrated while their own sustainability chief became a whistleblower. $19M SEC penalty.',
-    tag: 'Certification Component',
-    component: 'CERTIFICATION — Third-party audit verification',
+    claim: '€900bn \'ESG\'.',
+    reality: 'Raided for greenwashing.',
+    context: 'Own sustainability chief became a whistleblower. $19M SEC penalty followed.',
+    tag: '→ CERTIFICATION',
   },
   {
     slug: 'sfdr',
     company: 'Boohoo',
-    stat: '−50% in 48hrs',
-    body: 'Scored well on every ESG platform. Its Leicester supplier paid workers £3.50/hour. The supply chain was invisible.',
-    tag: 'Supply Chain Component',
-    component: 'SUPPLY CHAIN — Upstream verification',
+    claim: 'Top-rated supply chain.',
+    reality: 'Wages below legal minimum.',
+    context: 'Supply chain scored highly on every ESG platform. Leicester supplier paid £3.50/hour.',
+    tag: '→ SUPPLY CHAIN',
   },
   {
     slug: 'sfdr',
-    company: 'SFDR Funds',
-    stat: '350 downgrades',
-    body: 'Reclassified in a single quarter when regulators clarified what "sustainable" actually meant. Billions had already flowed in.',
-    tag: 'Disclosure Component',
-    component: 'CERTIFICATION — Classification verification',
+    company: 'SFDR Article 9',
+    claim: 'Darkest-green funds.',
+    reality: '350+ quietly downgraded.',
+    context: 'Billions flowed in on the label. Regulators clarified the standard. One quarter, mass reclassification.',
+    tag: '→ REGULATION',
   },
   {
     slug: 'verra',
     company: 'Verra',
-    stat: '90% phantom',
-    body: 'REDD+ credits representing no real avoided emissions. Companies met net-zero pledges with accounting constructs.',
-    tag: 'Verification Component',
-    component: 'EMISSIONS — Scope 3 offset verification',
+    claim: 'Certified carbon offset.',
+    reality: '~90% phantom credits.',
+    context: 'REDD+ credits certified. Investigation found no real avoided emissions behind them.',
+    tag: '→ CARBON MARKETS',
   },
   {
     slug: 'msci-mirage',
     company: 'MSCI',
-    stat: '0.54 correlation',
-    body: 'Pairwise correlation between major ESG raters. The same company, rated wildly differently. No agreed standard exists.',
-    tag: 'Measurement Component',
-    component: 'All components — methodology standardisation',
+    claim: 'ESG rating leader.',
+    reality: '0.5 correlation between raters.',
+    context: 'The same company, rated wildly differently by every major agency. No agreed standard exists.',
+    tag: '→ RATINGS',
   },
 ];
 
 export default function CaseStudies() {
-  const [activeIdx, setActiveIdx] = useState(0);
-  const [visible, setVisible] = useState(true);
-  const triggerRefs = useRef<(HTMLDivElement | null)[]>([]);
-
-  useEffect(() => {
-    const observers: IntersectionObserver[] = [];
-
-    CASES.forEach((_, i) => {
-      const el = triggerRefs.current[i];
-      if (!el) return;
-
-      const obs = new IntersectionObserver(
-        ([entry]) => {
-          if (entry.isIntersecting) {
-            setVisible(false);
-            setTimeout(() => {
-              setActiveIdx(i);
-              setVisible(true);
-            }, 220);
-          }
-        },
-        { threshold: 0.5 },
-      );
-
-      obs.observe(el);
-      observers.push(obs);
-    });
-
-    return () => observers.forEach((o) => o.disconnect());
-  }, []);
-
-  const c = CASES[activeIdx];
-
   return (
-    <section className="case-studies-section" id="case-studies">
-      {/* Sticky display panel — sits above the triggers */}
-      <div className="case-sticky">
-        <div className={`case-display ${visible ? 'visible' : 'hidden'}`}>
-          <p className="case-number">{String(activeIdx + 1).padStart(2, '0')} / 06</p>
-          <h2 className="case-company">{c.company}</h2>
-          <p className="case-stat">{c.stat}</p>
-          <p className="case-body">{c.body}</p>
-          <p className="case-tag">→ {c.component}</p>
-          <a
-            href={`/case-studies/${c.slug}`}
-            className="case-link"
-          >
-            Read case study →
-          </a>
-        </div>
-      </div>
-
-      {/* Scroll triggers — one per case, each 100vh */}
-      <div className="case-triggers">
-        {CASES.map((_, i) => (
-          <div
-            key={i}
-            className="case-trigger"
-            ref={(el) => { triggerRefs.current[i] = el; }}
-          />
+    <section className="cs-section" id="case-studies">
+      <div className="cs-track" id="cs-track">
+        {CASES.map((c, i) => (
+          <div className="cs-panel" key={c.slug + i}>
+            <div className="cs-panel-inner">
+              <span className="cs-idx">0{i + 1} — 06</span>
+              <div className="cs-company">{c.company}</div>
+              <div className="cs-claim">{c.claim}</div>
+              <div className="cs-reality">{c.reality}</div>
+              <p className="cs-context">{c.context}</p>
+              <span className="cs-tag">{c.tag}</span>
+              <a href={`/case-studies/${c.slug}`} className="cs-link">
+                Read case study →
+              </a>
+            </div>
+          </div>
         ))}
+      </div>
+      <div className="cs-progress-bar">
+        <div className="cs-progress-fill" id="cs-progress-fill" />
       </div>
     </section>
   );
