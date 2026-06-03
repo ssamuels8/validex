@@ -1,102 +1,128 @@
-import Image from 'next/image';
+'use client';
 
-interface GalleryItem {
+import { useEffect, useRef, useState } from 'react';
+
+interface Case {
   slug: string;
-  title: string;
-  description: string;
-  image: string;
+  company: string;
+  stat: string;
+  body: string;
   tag: string;
+  component: string;
 }
 
-const ITEMS: GalleryItem[] = [
+const CASES: Case[] = [
+  {
+    slug: 'volkswagen',
+    company: 'Volkswagen',
+    stat: 'AA Rating',
+    body: 'While 11 million vehicles were actively falsifying emissions tests. The score said safe. The reality did not.',
+    tag: 'Emissions Component',
+    component: 'EMISSIONS — Scope 1 independent verification',
+  },
   {
     slug: 'dws',
-    title: 'DWS and the Elastic ESG Label',
-    description:
-      'DWS marketed €900bn as ESG-integrated while the SEC found it lacked adequate policies to support those claims. $19M penalty. The definition of sustainable was set by the seller.',
-    image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800',
-    tag: 'Asset Management · 2021',
+    company: 'DWS',
+    stat: '€900bn',
+    body: 'Marketed as ESG-integrated while their own sustainability chief became a whistleblower. $19M SEC penalty.',
+    tag: 'Certification Component',
+    component: 'CERTIFICATION — Third-party audit verification',
   },
   {
     slug: 'sfdr',
-    title: 'SFDR Article 9: The Downgrade Wave',
-    description:
-      '350+ funds reclassified in a single quarter after regulators clarified that "sustainable" meant something specific. Billions had flowed in on a label no one had verified.',
-    image: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800',
-    tag: 'Regulation · 2022',
+    company: 'Boohoo',
+    stat: '−50% in 48hrs',
+    body: 'Scored well on every ESG platform. Its Leicester supplier paid workers £3.50/hour. The supply chain was invisible.',
+    tag: 'Supply Chain Component',
+    component: 'SUPPLY CHAIN — Upstream verification',
   },
   {
-    slug: 'aggregate-confusion',
-    title: 'Aggregate Confusion: Ratings Divergence',
-    description:
-      'MIT Sloan, 2022: pairwise correlation between major ESG raters averages 0.5. The same company, rated wildly differently. No agreed standard exists.',
-    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800',
-    tag: 'Research · 2022',
-  },
-  {
-    slug: 'msci-mirage',
-    title: "MSCI's ESG Mirage",
-    description:
-      'Bloomberg, 2021: MSCI upgrades driven by reduced risk to the company, not reduced harm to the world. The system measures the wrong variable and markets it as sustainability leadership.',
-    image: 'https://images.unsplash.com/photo-1464938050520-ef2270bb8ce8?w=800',
-    tag: 'Ratings · 2021',
+    slug: 'sfdr',
+    company: 'SFDR Funds',
+    stat: '350 downgrades',
+    body: 'Reclassified in a single quarter when regulators clarified what "sustainable" actually meant. Billions had already flowed in.',
+    tag: 'Disclosure Component',
+    component: 'CERTIFICATION — Classification verification',
   },
   {
     slug: 'verra',
-    title: 'Verra Rainforest Offsets: Phantom Credits',
-    description:
-      'Guardian / Zeit investigation, 2023: 90%+ of Verra REDD+ credits represented no real avoided emissions. Companies met net-zero pledges with accounting constructs.',
-    image: 'https://images.unsplash.com/photo-1448375240586-882707db888b?w=800',
-    tag: 'Offsets · 2023',
+    company: 'Verra',
+    stat: '90% phantom',
+    body: 'REDD+ credits representing no real avoided emissions. Companies met net-zero pledges with accounting constructs.',
+    tag: 'Verification Component',
+    component: 'EMISSIONS — Scope 3 offset verification',
   },
   {
-    slug: 'volkswagen',
-    title: 'Volkswagen and the DJSI: Leadership Exposed',
-    description:
-      'September 2015: VW ranked #1 among global automakers in the Dow Jones Sustainability Index. Weeks later: 11 million defeat devices. The rating rewarded what was reported, not what was real.',
-    image: 'https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=800',
-    tag: 'Automotive · 2015',
+    slug: 'msci-mirage',
+    company: 'MSCI',
+    stat: '0.54 correlation',
+    body: 'Pairwise correlation between major ESG raters. The same company, rated wildly differently. No agreed standard exists.',
+    tag: 'Measurement Component',
+    component: 'All components — methodology standardisation',
   },
 ];
 
 export default function CaseStudies() {
+  const [activeIdx, setActiveIdx] = useState(0);
+  const [visible, setVisible] = useState(true);
+  const triggerRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+  useEffect(() => {
+    const observers: IntersectionObserver[] = [];
+
+    CASES.forEach((_, i) => {
+      const el = triggerRefs.current[i];
+      if (!el) return;
+
+      const obs = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            setVisible(false);
+            setTimeout(() => {
+              setActiveIdx(i);
+              setVisible(true);
+            }, 220);
+          }
+        },
+        { threshold: 0.5 },
+      );
+
+      obs.observe(el);
+      observers.push(obs);
+    });
+
+    return () => observers.forEach((o) => o.disconnect());
+  }, []);
+
+  const c = CASES[activeIdx];
+
   return (
-    <section className="case-studies" id="case-studies">
-      <div className="case-studies-header">
-        <span className="section-label condensed">§ 03 — The Pattern</span>
-        <h2 className="case-studies-title display">
-          Six Failures. One Missing Instrument.
-        </h2>
-        <p className="case-studies-desc">
-          The same pattern, documented across regulators, academics, and
-          investigative journalists. The market accepted declaration as proof.
-          It was not.
-        </p>
+    <section className="case-studies-section" id="case-studies">
+      {/* Sticky display panel — sits above the triggers */}
+      <div className="case-sticky">
+        <div className={`case-display ${visible ? 'visible' : 'hidden'}`}>
+          <p className="case-number">{String(activeIdx + 1).padStart(2, '0')} / 06</p>
+          <h2 className="case-company">{c.company}</h2>
+          <p className="case-stat">{c.stat}</p>
+          <p className="case-body">{c.body}</p>
+          <p className="case-tag">→ {c.component}</p>
+          <a
+            href={`/case-studies/${c.slug}`}
+            className="case-link"
+          >
+            Read case study →
+          </a>
+        </div>
       </div>
 
-      <div className="gallery4-grid">
-        {ITEMS.map((item) => (
-          <a
-            key={item.slug}
-            href={`/case-studies/${item.slug}`}
-            className="gallery4-card"
-            aria-label={item.title}
-          >
-            <Image
-              src={item.image}
-              alt={item.title}
-              fill
-              sizes="(max-width: 480px) 100vw, (max-width: 900px) 50vw, 33vw"
-              className="gallery4-img"
-              style={{ objectFit: 'cover' }}
-            />
-            <div className="gallery4-overlay" />
-            <div className="gallery4-content">
-              <span className="gallery4-tag condensed">{item.tag}</span>
-              <div className="gallery4-title display">{item.title}</div>
-              <p className="gallery4-desc">{item.description}</p>
-            </div>
-          </a>
+      {/* Scroll triggers — one per case, each 100vh */}
+      <div className="case-triggers">
+        {CASES.map((_, i) => (
+          <div
+            key={i}
+            className="case-trigger"
+            ref={(el) => { triggerRefs.current[i] = el; }}
+          />
         ))}
       </div>
     </section>

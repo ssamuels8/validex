@@ -2,21 +2,19 @@ export default function CtaSection() {
   return (
     <section className="cta-section" id="contact">
       <div className="cta-inner">
-        <span className="cta-eyebrow condensed">§ 06 — Get In Touch</span>
-        <h2 className="cta-headline display">
-          Start<br />
-          Measuring.
+        <span className="section-label" style={{ color: 'var(--green)' }}>
+          Get In Touch
+        </span>
+        <h2 className="cta-headline">
+          Start<br />Measuring.
         </h2>
         <p className="cta-sub">
-          We are onboarding a small number of corporate and institutional
-          partners. If you are building toward CSRD compliance or allocating
-          capital into sustainability-linked assets — this is the conversation
-          to have.
+          We are onboarding a small number of partners.<br />
+          No forms. Just a conversation.
         </p>
-        <a href="mailto:hello@validex.com" className="cta-link condensed">
+        <a href="mailto:hello@validex.com" className="hero-btn">
           hello@validex.com ↗
         </a>
-        <p className="cta-note">No forms. No demos. A conversation.</p>
       </div>
     </section>
   );

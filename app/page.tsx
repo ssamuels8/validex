@@ -1,7 +1,7 @@
 import Nav          from '@/components/Nav';
 import Hero         from '@/components/Hero';
 import WhoWeAre     from '@/components/WhoWeAre';
-import Marquee      from '@/components/Marquee';
+import TheProblem   from '@/components/TheProblem';
 import CaseStudies  from '@/components/CaseStudies';
 import System       from '@/components/System';
 import Score        from '@/components/Score';
@@ -15,7 +15,7 @@ export default function Page() {
       <Nav />
       <Hero />
       <WhoWeAre />
-      <Marquee />
+      <TheProblem />
       <CaseStudies />
       <System />
       <Score />

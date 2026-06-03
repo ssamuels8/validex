@@ -2,22 +2,21 @@ export default function WhoWeAre() {
   return (
     <section className="who-section" id="who-we-are">
       <div className="who-inner">
-        <span className="section-label condensed">§ 01 — Who We Are</span>
-        <h2 className="who-headline display">
-          We are operators.<br />
-          Not consultants.
+        <span className="section-label">Who We Are</span>
+        <h2 className="who-headline">
+          Operators who discovered<br />a structural gap.
         </h2>
         <div className="who-body">
           <p>
-            We built companies inside the sustainability economy. We discovered,
-            firsthand, that no credible external measure of what we were doing
-            existed. The score we needed did not exist. So we built it.
+            We built companies inside the sustainability economy.
+            We discovered, firsthand, that no credible external measure of
+            what we were doing existed. The score we needed did not exist.
+            So we built it.
           </p>
           <p>
-            Validex is anchored to Evolmet — a platform matching buyers and
-            sellers of recycled aluminium to reduce cost and verified CO₂
-            emissions. Not a case study. The operational proof that the
-            measurement gap is real, and closeable.
+            We are not consultants who decided to build software.
+            We are operators who discovered a structural gap and built the
+            measurement system to close it.
           </p>
         </div>
       </div>

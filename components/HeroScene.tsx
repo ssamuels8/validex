@@ -5,42 +5,36 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { useGLTF, Environment } from '@react-three/drei';
 import * as THREE from 'three';
 
-/* ── Material upgrade after GLTF load ───────────────────── */
-function upgradeMat(mat: THREE.Material) {
-  if (
-    mat instanceof THREE.MeshStandardMaterial ||
-    mat instanceof THREE.MeshPhysicalMaterial
-  ) {
+function upgradeMaterial(mat: THREE.Material) {
+  if (mat instanceof THREE.MeshStandardMaterial) {
     const phys = mat as THREE.MeshPhysicalMaterial;
-    if (mat.transparent || mat.name === 'GlassBox' || mat.name === 'Material') {
-      phys.transmission   = 0.9;
+    if (mat.name === 'Glass' || mat.transparent || mat.name === 'Material') {
+      phys.transmission   = 0.88;
       phys.roughness      = 0.04;
       phys.ior            = 1.45;
       phys.thickness      = 0.5;
-      phys.iridescence    = 0.4;
+      phys.iridescence    = 0.45;
       phys.iridescenceIOR = 1.3;
-      phys.color          = new THREE.Color('#aaffcc');
+      phys.color          = new THREE.Color('#a8f0cc');
       phys.transparent    = true;
-      phys.opacity        = 0.88;
+      phys.opacity        = 0.85;
       phys.side           = THREE.FrontSide;
       phys.needsUpdate    = true;
     }
-    if (mat.name === 'EdgeGlow') {
-      const std = mat as THREE.MeshStandardMaterial;
-      std.color             = new THREE.Color('#4FAE7E');
-      std.emissive          = new THREE.Color('#4FAE7E');
-      std.emissiveIntensity = 0.4;
+    if (mat.name === 'Edge') {
+      mat.color             = new THREE.Color('#4FAE7E');
+      (mat as THREE.MeshStandardMaterial).emissive = new THREE.Color('#2A6B4A');
+      (mat as THREE.MeshStandardMaterial).emissiveIntensity = 0.3;
     }
-    if (mat.name === 'Vegetation') {
-      const std = mat as THREE.MeshStandardMaterial;
-      std.color             = new THREE.Color('#2D5A42');
-      std.emissive          = new THREE.Color('#4FAE7E');
-      std.emissiveIntensity = 0.45;
+    if (mat.name === 'Veg') {
+      mat.color             = new THREE.Color('#1a5c35');
+      (mat as THREE.MeshStandardMaterial).emissive = new THREE.Color('#2A6B4A');
+      (mat as THREE.MeshStandardMaterial).emissiveIntensity = 0.4;
+      mat.roughness         = 0.8;
     }
   }
 }
 
-/* ── Model ───────────────────────────────────────────────── */
 interface ModelProps {
   isDraggingRef: React.MutableRefObject<boolean>;
   manualRotRef:  React.MutableRefObject<{ x: number; y: number }>;
@@ -48,8 +42,8 @@ interface ModelProps {
 
 function ValidexModel({ isDraggingRef, manualRotRef }: ModelProps) {
   const groupRef = useRef<THREE.Group>(null);
-  const autoRotY = useRef(-0.35);
-  const autoRotX = useRef(0.18);
+  const rotY = useRef(-0.4);
+  const rotX = useRef(0.2);
 
   const { scene } = useGLTF('/hero-object.glb');
 
@@ -57,38 +51,35 @@ function ValidexModel({ isDraggingRef, manualRotRef }: ModelProps) {
     scene.traverse((child) => {
       if (child instanceof THREE.Mesh) {
         const mat = child.material;
-        if (Array.isArray(mat)) mat.forEach(upgradeMat);
-        else upgradeMat(mat as THREE.Material);
+        if (Array.isArray(mat)) mat.forEach(upgradeMaterial);
+        else upgradeMaterial(mat as THREE.Material);
       }
     });
   }, [scene]);
 
   useFrame((state, delta) => {
-    const group = groupRef.current;
-    if (!group) return;
-
+    const g = groupRef.current;
+    if (!g) return;
     if (isDraggingRef.current) {
-      autoRotY.current  += manualRotRef.current.y;
-      autoRotX.current  += manualRotRef.current.x;
+      rotY.current += manualRotRef.current.y;
+      rotX.current += manualRotRef.current.x;
       manualRotRef.current.x = 0;
       manualRotRef.current.y = 0;
     } else {
-      autoRotY.current += delta * 0.22;
+      rotY.current += delta * 0.2;
     }
-
-    group.rotation.y = autoRotY.current;
-    group.rotation.x = THREE.MathUtils.clamp(autoRotX.current, -0.55, 0.55);
-    group.position.y = Math.sin(state.clock.getElapsedTime() * 0.7) * 0.07;
+    g.rotation.y = rotY.current;
+    g.rotation.x = THREE.MathUtils.clamp(rotX.current, -0.5, 0.5);
+    g.position.y = Math.sin(state.clock.getElapsedTime() * 0.65) * 0.06;
   });
 
   return (
-    <group ref={groupRef} scale={0.38} rotation={[0.18, -0.35, 0]}>
+    <group ref={groupRef} scale={0.36} rotation={[0.2, -0.4, 0]}>
       <primitive object={scene} />
     </group>
   );
 }
 
-/* ── Canvas wrapper ──────────────────────────────────────── */
 export default function HeroScene() {
   const isDragging  = useRef(false);
   const prevPointer = useRef({ x: 0, y: 0 });
@@ -96,7 +87,7 @@ export default function HeroScene() {
 
   return (
     <div
-      style={{ position: 'absolute', inset: 0, cursor: 'grab' }}
+      style={{ width: '100%', height: '100%', position: 'relative' }}
       onPointerDown={(e) => {
         isDragging.current = true;
         prevPointer.current = { x: e.clientX, y: e.clientY };
@@ -108,35 +99,19 @@ export default function HeroScene() {
         manualRot.current.x += (e.clientY - prevPointer.current.y) * 0.004;
         prevPointer.current = { x: e.clientX, y: e.clientY };
       }}
-      onPointerUp={() => {
-        isDragging.current = false;
-      }}
-      onPointerLeave={() => {
-        isDragging.current = false;
-      }}
+      onPointerUp={() => { isDragging.current = false; }}
+      onPointerLeave={() => { isDragging.current = false; }}
     >
       <Canvas
-        camera={{ position: [0, 1.5, 5.5], fov: 42 }}
-        gl={{
-          alpha: true,
-          antialias: true,
-          toneMapping: THREE.ACESFilmicToneMapping,
-          toneMappingExposure: 1.1,
-        }}
+        camera={{ position: [0, 1.2, 5.5], fov: 42 }}
+        gl={{ alpha: true, antialias: true, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.1 }}
         style={{ width: '100%', height: '100%' }}
       >
-        <ambientLight intensity={0.4} />
-        <directionalLight
-          position={[4, 6, 3]}
-          intensity={1.4}
-          color="#ffffff"
-          castShadow
-        />
-        <pointLight position={[-3, 5, -2]} intensity={1.2} color="#4FAE7E" />
-        <pointLight position={[3, -1, 4]} intensity={0.3} color="#88aaff" />
-
+        <ambientLight intensity={0.5} />
+        <directionalLight position={[4, 6, 3]} intensity={1.4} color="#ffffff" />
+        <pointLight position={[-3, 5, -2]} intensity={1.0} color="#4FAE7E" />
+        <pointLight position={[3, -1, 4]} intensity={0.25} color="#8899ff" />
         <Environment preset="city" background={false} />
-
         <ValidexModel isDraggingRef={isDragging} manualRotRef={manualRot} />
       </Canvas>
     </div>
