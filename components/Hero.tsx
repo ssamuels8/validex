@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+// import { SplineScene } from '@/components/ui/splite'; // (for 3D swap)
 
 const WORDS = ["Proof,", "Not", "Promise."];
 
@@ -30,6 +31,23 @@ export default function Hero() {
         </div>
       </div>
 
+      {/* ── HERO OBJECT ─────────────────────────────────────────────
+          Currently: next/image with mix-blend-mode multiply.
+          Light-grey image background dissolves into var(--paper) bone.
+
+          === SWAP TO LIVE 3D: uncomment the SplineScene block below
+              and comment out the Image block. Paste your scene URL. ===
+
+          <div className="hero-image-wrap" id="hero-image-wrap">
+            <div className="hero-image-tilt" id="hero-image-tilt">
+              <SplineScene
+                scene="PASTE_SPLINE_SCENE_URL_HERE"
+                className="w-full h-full"
+              />
+            </div>
+          </div>
+
+          =========================================================== */}
       <div className="hero-image-wrap" id="hero-image-wrap">
         <div className="hero-image-tilt" id="hero-image-tilt">
           <Image
