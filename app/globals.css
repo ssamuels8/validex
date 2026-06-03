@@ -176,24 +176,25 @@ h1, h2, h3, h4, h5, h6 {
   background: var(--paper);
 }
 
-/* Warm radial glow — bleeds from right where object sits */
+/* Warm radial glow — shifted right where object now lives */
 .hero-atmosphere {
   position: absolute;
   inset: 0;
   z-index: 0;
   background:
-    radial-gradient(ellipse 70% 60% at 72% 55%, rgba(247,243,234,0.9) 0%, transparent 65%),
-    radial-gradient(ellipse 45% 38% at 68% 70%, rgba(46,94,62,0.05) 0%, transparent 58%);
+    radial-gradient(ellipse 70% 60% at 80% 55%, rgba(247,243,234,0.9) 0%, transparent 65%),
+    radial-gradient(ellipse 45% 38% at 78% 70%, rgba(46,94,62,0.05) 0%, transparent 58%);
   pointer-events: none;
 }
 
-/* Object — centered via calc so GSAP only needs to animate y/opacity/scale */
+/* Object — right-anchored, 50% bigger, bleeds off right edge */
 .hero-image-wrap {
   position: absolute;
-  left: calc(50% - clamp(450px, 39vw, 825px));
-  top: calc(54% - clamp(253px, 21.9vw, 465px));
-  right: auto;
-  width: clamp(900px, 78vw, 1650px);
+  right: -8%;
+  left: auto;
+  /* Vertical centering via calc (half of element height ≈ width/1.777 / 2) */
+  top: calc(50% - clamp(309px, 25.88vw, 577px));
+  width: clamp(1100px, 92vw, 2050px);
   z-index: 1;
   pointer-events: none;
   user-select: none;
@@ -231,10 +232,11 @@ h1, h2, h3, h4, h5, h6 {
   50%       { transform: translateY(-16px); }
 }
 
-/* Text — top-left, anchored ~20vh from top, overlaps object upper-left */
+/* Text — vertically centered left, z2 */
 .hero-text {
   position: absolute;
-  top: 20vh;
+  top: 50%;
+  transform: translateY(-50%);
   left: 0;
   z-index: 2;
   display: flex;
@@ -243,7 +245,7 @@ h1, h2, h3, h4, h5, h6 {
   text-align: left;
   padding-left: clamp(2rem, 6vw, 7rem);
   padding-right: 2rem;
-  max-width: 68vw;
+  max-width: 85vw;
 }
 .hero-pill {
   display: inline-block;
@@ -259,18 +261,13 @@ h1, h2, h3, h4, h5, h6 {
   opacity: 0;
   font-family: var(--font-mono), 'DM Mono', monospace !important;
 }
+/* Wrapper div for the shiny headline — font scale on inner spans via Tailwind */
 .hero-headline {
-  font-size: clamp(3.5rem, 8.5vw, 9.5rem);
-  font-weight: 800;
-  line-height: 0.9;
-  letter-spacing: -0.03em;
-  color: var(--ink);
+  opacity: 0; /* GSAP fades+rises this block on entrance */
   margin-bottom: 1.5rem;
   font-feature-settings: "ss01", "cv01";
   text-rendering: optimizeLegibility;
 }
-/* After entrance, allow sub-pixel overflow for scroll parallax */
-.hero-headline.revealed .line-mask { overflow: visible; }
 .hero-sub {
   font-size: 1rem;
   font-weight: 400;
@@ -1269,6 +1266,7 @@ h1, h2, h3, h4, h5, h6 {
   .hero-text {
     position: static;
     top: auto;
+    transform: none;
     max-width: 100%;
     padding: clamp(5rem, 14vh, 8rem) 1.75rem 2.5rem;
     align-items: flex-start;
@@ -1355,7 +1353,6 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 @media (max-width: 480px) {
-  .hero-headline { font-size: clamp(3.2rem, 13vw, 5rem); }
   .hero-image-wrap { width: 100vw; }
   .sc-grades { grid-template-columns: 1fr; }
   .grade-letter { font-size: 5rem; }

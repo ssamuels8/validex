@@ -2,9 +2,12 @@
 
 import Image from 'next/image';
 import { ArrowDown } from 'lucide-react';
-// import { SplineScene } from '@/components/ui/splite'; // (for 3D swap)
+import { AnimatedShinyText } from './ui/animated-shiny-text';
 
-const LINES = ['Measure', 'What Others', 'Only', 'Promise.'];
+const GRADIENT = 'linear-gradient(90deg, #15130E, #2E5E3E, #15130E)';
+const TEXT_CLS =
+  'display font-extrabold tracking-[-0.03em] leading-[0.9] text-[clamp(2.6rem,8.5vw,9.5rem)] text-left';
+const WRAP_CLS = 'justify-start items-start py-0 text-left';
 
 export default function Hero() {
   return (
@@ -13,34 +16,44 @@ export default function Hero() {
       {/* Warm radial glow */}
       <div className="hero-atmosphere" aria-hidden="true" />
 
-      {/* Text — top-left; comes first in DOM so mobile stacks it above the object */}
+      {/* Text block — vertically centered left, z2; first in DOM so mobile stacks above object */}
       <div className="hero-text">
         <span className="hero-pill">
           Independent Sustainability Measurement
         </span>
-        <h1 className="hero-headline display" id="hero-headline">
-          {LINES.map((line, i) => (
-            <span key={i} className="line-mask" data-line={i}>
-              <span className="line-mask-inner">{line}</span>
-            </span>
-          ))}
-        </h1>
+
+        {/* Headline wrapper — GSAP fades+rises this whole block */}
+        <div className="hero-headline" id="hero-headline">
+          <AnimatedShinyText
+            gradientColors={GRADIENT}
+            gradientAnimationDuration={4}
+            hoverEffect={false}
+            textClassName={TEXT_CLS}
+            className={WRAP_CLS}
+          >
+            They Promise,
+          </AnimatedShinyText>
+          <AnimatedShinyText
+            gradientColors={GRADIENT}
+            gradientAnimationDuration={4}
+            hoverEffect={false}
+            textClassName={TEXT_CLS}
+            className={WRAP_CLS}
+          >
+            We Measure.
+          </AnimatedShinyText>
+        </div>
+
         <p className="hero-sub">
           The independent measurement layer for sustainability.
           Anchored to ESRS. Built for the sceptic.
         </p>
       </div>
 
-      {/* Object — centered, large, bleeds off edges */}
+      {/* Object — right-anchored, large, bleeds off right edge */}
       <div className="hero-image-wrap" id="hero-image-wrap">
         <div className="hero-object-shadow" aria-hidden="true" />
         <div className="hero-image-tilt" id="hero-image-tilt">
-          {/* === SWAP TO LIVE 3D: uncomment SplineScene, remove Image block ===
-          <SplineScene
-            scene="PASTE_SPLINE_SCENE_URL_HERE"
-            className="w-full h-full"
-          />
-          ================================================================= */}
           <Image
             src="/hero-object.png"
             alt="Validex — verified sustainability measurement instrument"

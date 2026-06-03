@@ -301,10 +301,8 @@ export default function SiteScripts() {
         });
       });
 
-      // ── Hero scroll parallax: object drifts, headline lines at different rates ──
+      // ── Hero scroll parallax: object drifts up + fades ──────
       const imgWrap = document.getElementById('hero-image-wrap');
-      const heroText = document.querySelector<HTMLElement>('.hero-text');
-      const lineMasks = document.querySelectorAll<HTMLElement>('.hero-headline .line-mask');
       if (!prefersReduced) {
         ScrollTrigger.create({
           trigger: '#hero',
@@ -314,12 +312,6 @@ export default function SiteScripts() {
           onUpdate(self: { progress: number }) {
             const p = self.progress;
             if (imgWrap) gsap.set(imgWrap, { y: -120 * p, opacity: 1 - p * 0.7 });
-            if (heroText) gsap.set(heroText, { y: -55 * p });
-            // Per-line parallax — "Measure" fastest, "Promise." slowest = layered depth
-            const lineRates = [-45, -32, -20, -10];
-            lineMasks.forEach((mask, i) => {
-              gsap.set(mask, { y: lineRates[i] * p });
-            });
           },
         });
       }
@@ -350,20 +342,18 @@ export default function SiteScripts() {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     function revealHero(gsap: any) {
-      const pill      = document.querySelector<HTMLElement>('.hero-pill');
-      const words     = document.querySelectorAll<HTMLElement>('.hero-headline .line-mask-inner');
-      const imgWrap   = document.getElementById('hero-image-wrap');
-      const heroSub   = document.querySelector<HTMLElement>('.hero-sub');
-      const scrollCue = document.getElementById('hero-scroll-cue');
-      const headline  = document.getElementById('hero-headline');
+      const pill         = document.querySelector<HTMLElement>('.hero-pill');
+      const headlineBlock = document.getElementById('hero-headline');
+      const imgWrap      = document.getElementById('hero-image-wrap');
+      const heroSub      = document.querySelector<HTMLElement>('.hero-sub');
+      const scrollCue    = document.getElementById('hero-scroll-cue');
 
       if (prefersReduced) {
-        words.forEach((w) => { w.style.transform = 'none'; });
         if (pill) pill.style.opacity = '1';
+        if (headlineBlock) headlineBlock.style.opacity = '1';
         if (imgWrap) gsap.set(imgWrap, { opacity: 1 });
         if (heroSub) heroSub.style.opacity = '1';
         if (scrollCue) scrollCue.style.opacity = '1';
-        if (headline) headline.classList.add('revealed');
         return;
       }
 
@@ -373,14 +363,13 @@ export default function SiteScripts() {
         { opacity: 1, y: 0, duration: 0.6, delay: 0.0, ease: 'power3.out' }
       );
 
-      // t=0.15 — headline: each line mask-revealed (translateY 110%→0), stagger 0.12s
-      words.forEach((w, i) => {
-        gsap.to(w, { y: 0, duration: 1.0, delay: 0.15 + i * 0.12, ease: 'power4.out' });
-      });
-      // Mark headline revealed after all lines finish (last line: 0.15+0.36+1.0 ≈ 1.5s)
-      setTimeout(() => headline?.classList.add('revealed'), 1550);
+      // t=0.15 — headline block fades+rises as one unit (no per-line mask — shiny gradient runs freely)
+      if (headlineBlock) gsap.fromTo(headlineBlock,
+        { opacity: 0, y: 30 },
+        { opacity: 1, y: 0, duration: 0.9, delay: 0.15, ease: 'power3.out' }
+      );
 
-      // t=0.40 — object rises from below (CSS calc handles centering, GSAP only does y/scale/opacity)
+      // t=0.40 — object rises from below
       if (imgWrap) gsap.fromTo(imgWrap,
         { y: 70, scale: 0.95, opacity: 0 },
         {
