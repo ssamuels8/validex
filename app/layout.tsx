@@ -34,7 +34,7 @@ export const metadata: Metadata = {
   title: 'Validex — Verified Sustainability Scores',
   description:
     'Validex is the independent measurement layer for sustainability. Anchored to ESRS. Built for the sceptic.',
-  metadataBase: new URL('https://REPLACE-WITH-YOUR-DOMAIN'),
+  metadataBase: new URL('https://validex.vercel.app'),
   alternates: {
     canonical: '/',
   },
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
     title: 'Validex — Verified Sustainability Scores',
     description:
       'Validex is the independent measurement layer for sustainability. Anchored to ESRS. Built for the sceptic.',
-    url: 'https://REPLACE-WITH-YOUR-DOMAIN',
+    url: 'https://validex.vercel.app',
     siteName: 'Validex',
     images: [
       {
