@@ -131,50 +131,81 @@ h1, h2, h3, h4, h5, h6 {
 .site-nav {
   position: fixed;
   top: 0; left: 0; right: 0;
-  z-index: 500;
+  z-index: 20;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1.75rem 2.5rem;
-  mix-blend-mode: difference;
+  padding: 1.5rem 2.5rem;
+  transition: background 0.4s ease, backdrop-filter 0.4s ease;
+}
+.site-nav.scrolled {
+  background: rgba(242,238,228,0.72);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
 }
 .nav-logo {
   font-weight: 700;
   font-size: 1.1rem;
-  color: #fff;
+  color: var(--ink);
   letter-spacing: -0.01em;
 }
-/* Pill CTA — renders as dark pill on light bg, light on dark bg via difference blend */
 .nav-pill-cta {
   font-family: var(--font-mono), 'DM Mono', monospace !important;
   font-size: 0.72rem;
   font-weight: 500;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #fff;
-  border: 1px solid rgba(255,255,255,0.55);
+  background: var(--ink);
+  color: var(--paper);
   border-radius: 999px;
-  padding: 0.7rem 1.5rem;
-  transition: opacity 0.2s;
+  padding: 0.65rem 1.4rem;
+  transition: background 0.25s;
   will-change: transform;
   white-space: nowrap;
 }
-.nav-pill-cta:hover { opacity: 0.65; }
+.nav-pill-cta:hover { background: var(--moss); }
 
 /* ── Hero ───────────────────────────────────────────────── */
 .hero {
   position: relative;
   height: 100svh;
-  overflow: hidden;
-  background: var(--paper);
+  background: var(--paper); /* thin frame reveal around the panel */
 }
 
-/* Layer 0 — warm radial stage of light */
+/* Rounded framed panel — 10px inset, the hero "canvas" */
+.hero-panel {
+  position: absolute;
+  inset: 10px;
+  border-radius: 2.5rem;
+  overflow: hidden;
+  border: 1px solid var(--line-light);
+  /* Light/warm default panel background */
+  background: linear-gradient(180deg, #F2EEE4 0%, #E7E1D3 100%);
+}
+/* Moss radial glow low-center */
+.hero-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: radial-gradient(ellipse 55% 45% at 50% 82%, rgba(46,94,62,0.06) 0%, transparent 68%);
+  pointer-events: none;
+}
+/* === DARK PANEL VARIANT (swap bg + glow when class added) ===
+.hero-panel--dark {
+  background: var(--ink);
+}
+.hero-panel--dark::before {
+  background: radial-gradient(ellipse 55% 45% at 50% 82%, rgba(74,138,94,0.12) 0%, transparent 68%);
+}
+============================================================= */
+
+/* Layer 0 — extra warm glow (supplements panel gradient) */
 .hero-atmosphere {
   position: absolute;
   inset: 0;
   z-index: 0;
-  background: radial-gradient(ellipse 90% 65% at 50% 70%, #F7F3EA 0%, var(--paper) 68%);
+  background: radial-gradient(ellipse 80% 60% at 50% 68%, rgba(247,243,234,0.7) 0%, transparent 65%);
   pointer-events: none;
 }
 
@@ -1267,6 +1298,60 @@ h1, h2, h3, h4, h5, h6 {
   .site-footer { padding: 1.75rem 1.5rem; flex-direction: column; gap: 0.75rem; text-align: center; }
   .footer-right { justify-content: center; }
 }
+/* ── Infinite slider keyframe ─────────────────────────── */
+@keyframes infiniteSlide {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* ── Framework Marquee ───────────────────────────────── */
+.framework-strip {
+  background: var(--paper);
+  border-top: 1px solid var(--line-light);
+  padding: 1.75rem 0;
+  display: grid;
+  grid-template-columns: minmax(0, 220px) 1fr;
+  align-items: center;
+  gap: 0;
+}
+.framework-label-col {
+  padding: 0 2rem 0 6vw;
+  border-right: 1px solid var(--line-light);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+.framework-label {
+  font-family: var(--font-mono), 'DM Mono', monospace !important;
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--on-light);
+  text-align: right;
+  line-height: 1.4;
+}
+.framework-slider-col {
+  position: relative;
+  overflow: hidden;
+  padding: 0 0;
+}
+.framework-item {
+  font-family: var(--font-mono), 'DM Mono', monospace !important;
+  font-size: 0.9rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+@media (max-width: 768px) {
+  .framework-strip { grid-template-columns: 1fr; }
+  .framework-label-col { border-right: none; border-bottom: 1px solid var(--line-light); padding: 0 2rem 1rem; justify-content: flex-start; }
+  .framework-label { text-align: left; }
+}
+
 @media (max-width: 480px) {
   .hero-headline { font-size: clamp(3.2rem, 13vw, 5rem); }
   .hero-image-wrap { width: 100vw; }

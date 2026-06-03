@@ -1,7 +1,8 @@
-import Nav          from '@/components/Nav';
-import Preloader    from '@/components/Preloader';
-import Hero         from '@/components/Hero';
-import Manifesto    from '@/components/Manifesto';
+import Nav              from '@/components/Nav';
+import Preloader        from '@/components/Preloader';
+import Hero             from '@/components/Hero';
+import FrameworkMarquee from '@/components/FrameworkMarquee';
+import Manifesto        from '@/components/Manifesto';
 import WhoWeAre     from '@/components/WhoWeAre';
 import TheProblem   from '@/components/TheProblem';
 import CaseStudies  from '@/components/CaseStudies';
@@ -17,6 +18,7 @@ export default function Page() {
       <Preloader />
       <Nav />
       <Hero />
+      <FrameworkMarquee />
       <Manifesto />
       <WhoWeAre />
       <TheProblem />
