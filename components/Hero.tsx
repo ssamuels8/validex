@@ -10,10 +10,10 @@ export default function Hero() {
   return (
     <section className="hero" id="hero">
 
-      {/* Warm radial glow — atmosphere behind everything */}
+      {/* Warm radial glow */}
       <div className="hero-atmosphere" aria-hidden="true" />
 
-      {/* Object — transparent PNG, bottom-anchored, rises on load */}
+      {/* Object — right side, bleeds off edge, large */}
       <div className="hero-image-wrap" id="hero-image-wrap">
         <div className="hero-object-shadow" aria-hidden="true" />
         <div className="hero-image-tilt" id="hero-image-tilt">
@@ -33,14 +33,14 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* Text — upper center, above the object */}
+      {/* Text — left column, vertically centered */}
       <div className="hero-text">
         <span className="hero-pill">
           Independent Sustainability Measurement
         </span>
-        <h1 className="hero-headline">
+        <h1 className="hero-headline" id="hero-headline">
           {LINES.map((line, i) => (
-            <span key={i} className="line-mask">
+            <span key={i} className="line-mask" data-line={i}>
               <span className="line-mask-inner">{line}</span>
             </span>
           ))}
@@ -51,7 +51,7 @@ export default function Hero() {
         </p>
       </div>
 
-      {/* Scroll cue */}
+      {/* Scroll cue — bottom center */}
       <div className="hero-scroll-cue-wrap" id="hero-scroll-cue">
         <div className="hero-scroll-cue" aria-label="Scroll down">
           <ArrowDown size={16} strokeWidth={1.5} />

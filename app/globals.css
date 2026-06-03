@@ -168,29 +168,29 @@ h1, h2, h3, h4, h5, h6 {
 /* ── Hero ───────────────────────────────────────────────── */
 .hero {
   position: relative;
-  height: 100svh;
+  min-height: 100svh;
   overflow: hidden;
   background: var(--paper);
 }
 
-/* Warm radial glow — stage of light, low-center */
+/* Warm radial glow — bleeds from right where object sits */
 .hero-atmosphere {
   position: absolute;
   inset: 0;
   z-index: 0;
   background:
-    radial-gradient(ellipse 70% 55% at 50% 72%, rgba(247,243,234,0.85) 0%, transparent 65%),
-    radial-gradient(ellipse 50% 40% at 50% 82%, rgba(46,94,62,0.05) 0%, transparent 60%);
+    radial-gradient(ellipse 70% 60% at 72% 55%, rgba(247,243,234,0.9) 0%, transparent 65%),
+    radial-gradient(ellipse 45% 38% at 68% 70%, rgba(46,94,62,0.05) 0%, transparent 58%);
   pointer-events: none;
 }
 
-/* Object — transparent PNG, bottom-anchored */
+/* Object — right side, vertically centered, bleeds off right edge */
 .hero-image-wrap {
   position: absolute;
-  bottom: -2%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: clamp(700px, 68vw, 1050px);
+  right: -4%;
+  top: 50%;
+  /* No CSS transform — GSAP sets yPercent: -50 to center vertically */
+  width: clamp(820px, 58vw, 1500px);
   z-index: 1;
   pointer-events: none;
   user-select: none;
@@ -198,13 +198,13 @@ h1, h2, h3, h4, h5, h6 {
 }
 .hero-object-shadow {
   position: absolute;
-  bottom: 3%;
+  bottom: 4%;
   left: 50%;
   transform: translateX(-50%);
-  width: 58%;
-  height: 70px;
+  width: 55%;
+  height: 80px;
   background: radial-gradient(ellipse, rgba(21,19,14,0.10) 0%, transparent 72%);
-  filter: blur(40px);
+  filter: blur(44px);
   pointer-events: none;
   z-index: 0;
 }
@@ -219,28 +219,29 @@ h1, h2, h3, h4, h5, h6 {
   display: block;
   width: 100%;
   height: auto;
-  filter: drop-shadow(0 40px 70px rgba(21,19,14,0.12));
+  filter: drop-shadow(0 50px 90px rgba(21,19,14,0.16));
   animation: heroFloat 7s ease-in-out infinite;
   will-change: transform;
-  /* transparent PNG — no mix-blend-mode needed */
 }
 @keyframes heroFloat {
   0%, 100% { transform: translateY(0); }
-  50%       { transform: translateY(-14px); }
+  50%       { transform: translateY(-16px); }
 }
 
-/* Layer 2 — text: upper center */
+/* Text — left column, vertically centered */
 .hero-text {
   position: absolute;
-  top: 0; left: 0; right: 0;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
   z-index: 2;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
-  padding-top: clamp(4.5rem, 14vh, 9rem);
-  padding-left: 2rem;
+  align-items: flex-start;
+  text-align: left;
+  padding-left: clamp(2rem, 6vw, 7rem);
   padding-right: 2rem;
+  max-width: 52vw;
 }
 .hero-pill {
   display: inline-block;
@@ -252,30 +253,32 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 500;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  margin-bottom: 2.25rem;
+  margin-bottom: 2rem;
   opacity: 0;
   font-family: var(--font-mono), 'DM Mono', monospace !important;
 }
 .hero-headline {
-  font-size: clamp(3.2rem, 10vw, 11rem);
+  font-size: clamp(3.5rem, 8vw, 9rem);
   font-weight: 700;
-  line-height: 0.95;
+  line-height: 0.92;
   letter-spacing: -0.04em;
   color: var(--ink);
   margin-bottom: 1.5rem;
   font-feature-settings: "ss01", "cv01";
   text-rendering: optimizeLegibility;
 }
+/* After entrance, allow sub-pixel overflow for scroll parallax */
+.hero-headline.revealed .line-mask { overflow: visible; }
 .hero-sub {
   font-size: 1rem;
   font-weight: 400;
   line-height: 1.6;
   color: var(--on-light);
-  max-width: 34ch;
+  max-width: 32ch;
   opacity: 0;
 }
 
-/* Scroll cue — positioned separately so bob keyframe doesn't fight translateX */
+/* Scroll cue — bottom center */
 .hero-scroll-cue-wrap {
   position: absolute;
   bottom: 3.5vh;
@@ -1259,7 +1262,27 @@ h1, h2, h3, h4, h5, h6 {
 /* ── Responsive ─────────────────────────────────────────── */
 @media (max-width: 900px) {
   .site-nav { padding: 1.25rem 1.5rem; }
-  .hero-image-wrap { width: 90vw; }
+  /* Mobile hero: stack text top, object below */
+  .hero { min-height: 100svh; height: auto; overflow: hidden; }
+  .hero-text {
+    position: static;
+    transform: none;
+    max-width: 100%;
+    padding: clamp(5rem, 14vh, 8rem) 1.75rem 2.5rem;
+    align-items: flex-start;
+  }
+  .hero-image-wrap {
+    position: static;
+    right: auto;
+    top: auto;
+    width: 95vw;
+    margin: 0 auto;
+    opacity: 0; /* still hidden until GSAP reveals */
+  }
+  .hero-scroll-cue-wrap {
+    position: fixed;
+    bottom: 3vh;
+  }
   .who-cols { grid-template-columns: 1fr; gap: 2rem; }
   .manifesto { padding: 12vh 2rem; }
   .who-section { padding: 14vh 2rem; }

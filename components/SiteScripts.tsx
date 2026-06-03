@@ -301,10 +301,11 @@ export default function SiteScripts() {
         });
       });
 
-      // ── Hero scroll parallax: object drifts up + fades, headline drifts up ──
+      // ── Hero scroll parallax: object drifts, headline lines at different rates ──
       const imgWrap = document.getElementById('hero-image-wrap');
       const heroText = document.querySelector<HTMLElement>('.hero-text');
-      if (imgWrap && !prefersReduced) {
+      const lineMasks = document.querySelectorAll<HTMLElement>('.hero-headline .line-mask');
+      if (!prefersReduced) {
         ScrollTrigger.create({
           trigger: '#hero',
           start: 'top top',
@@ -312,8 +313,13 @@ export default function SiteScripts() {
           scrub: true,
           onUpdate(self: { progress: number }) {
             const p = self.progress;
-            gsap.set(imgWrap, { y: -120 * p, opacity: 1 - p * 0.7 });
-            if (heroText) gsap.set(heroText, { y: -60 * p });
+            if (imgWrap) gsap.set(imgWrap, { y: -120 * p, opacity: 1 - p * 0.7 });
+            if (heroText) gsap.set(heroText, { y: -55 * p });
+            // Per-line parallax — "Proof," fastest, "Promise." slowest = layered depth
+            const lineRates = [-40, -25, -10];
+            lineMasks.forEach((mask, i) => {
+              gsap.set(mask, { y: lineRates[i] * p });
+            });
           },
         });
       }
@@ -329,8 +335,8 @@ export default function SiteScripts() {
           const dx = (me.clientX - r.width / 2) / (r.width / 2);
           const dy = (me.clientY - r.height / 2) / (r.height / 2);
           gsap.to(tiltEl, {
-            rotateX: dy * -3.5,
-            rotateY: dx * 3.5,
+            rotateX: dy * -4,
+            rotateY: dx * 4,
             duration: 0.5,
             ease: 'power2.out',
             transformPerspective: 900,
@@ -349,14 +355,26 @@ export default function SiteScripts() {
       const imgWrap   = document.getElementById('hero-image-wrap');
       const heroSub   = document.querySelector<HTMLElement>('.hero-sub');
       const scrollCue = document.getElementById('hero-scroll-cue');
+      const headline  = document.getElementById('hero-headline');
 
       if (prefersReduced) {
         words.forEach((w) => { w.style.transform = 'none'; });
         if (pill) pill.style.opacity = '1';
-        if (imgWrap) { imgWrap.style.opacity = '1'; imgWrap.style.transform = 'translateX(-50%)'; }
+        // On desktop, vertically center the object via GSAP yPercent since CSS transform is removed
+        if (imgWrap) {
+          const isMobile = window.innerWidth <= 900;
+          gsap.set(imgWrap, { opacity: 1, ...(isMobile ? {} : { yPercent: -50 }) });
+        }
         if (heroSub) heroSub.style.opacity = '1';
         if (scrollCue) scrollCue.style.opacity = '1';
+        if (headline) headline.classList.add('revealed');
         return;
+      }
+
+      // Desktop: set yPercent -50 so GSAP controls vertical centering instead of CSS
+      const isMobile = window.innerWidth <= 900;
+      if (imgWrap && !isMobile) {
+        gsap.set(imgWrap, { yPercent: -50 });
       }
 
       // t=0.0 — eyebrow pill
@@ -365,19 +383,20 @@ export default function SiteScripts() {
         { opacity: 1, y: 0, duration: 0.6, delay: 0.0, ease: 'power3.out' }
       );
 
-      // t=0.15 — headline: each line mask-revealed, stagger 0.1s
+      // t=0.15 — headline: each line mask-revealed (translateY 110%→0), stagger 0.12s
       words.forEach((w, i) => {
-        gsap.to(w, { y: 0, duration: 0.9, delay: 0.15 + i * 0.1, ease: 'power4.out' });
+        gsap.to(w, { y: 0, duration: 1.0, delay: 0.15 + i * 0.12, ease: 'power4.out' });
       });
+      // Mark headline revealed after all lines finish (last line: 0.15+0.24+1.0 ≈ 1.4s)
+      setTimeout(() => headline?.classList.add('revealed'), 1450);
 
-      // t=0.40 — object RISES from below (empire-style)
+      // t=0.40 — object enters from right/below
       if (imgWrap) gsap.fromTo(imgWrap,
-        { y: 80, scale: 0.94, opacity: 0 },
+        { y: 70, scale: 0.95, opacity: 0 },
         {
           y: 0, scale: 1, opacity: 1,
           duration: 1.5, delay: 0.40,
           ease: 'power3.out',
-          transformOrigin: 'center bottom',
           clearProps: 'scale',
         }
       );
@@ -389,7 +408,7 @@ export default function SiteScripts() {
       );
       if (scrollCue) gsap.fromTo(scrollCue,
         { opacity: 0 },
-        { opacity: 1, duration: 0.6, delay: 1.0, ease: 'power2.out' }
+        { opacity: 1, duration: 0.6, delay: 1.1, ease: 'power2.out' }
       );
     }
 
