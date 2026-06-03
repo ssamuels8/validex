@@ -67,19 +67,6 @@ export default function SiteScripts() {
         revealHero(gsap);
       }
 
-      // ── Custom cursor ───────────────────────────────────────
-      const dot  = document.getElementById('cursor-dot');
-      const ring = document.getElementById('cursor-ring');
-      if (dot && ring && !prefersReduced) {
-        let ringX = 0, ringY = 0;
-        document.addEventListener('mousemove', (e) => {
-          gsap.set(dot,  { x: e.clientX, y: e.clientY });
-          ringX += (e.clientX - ringX) * 0.12;
-          ringY += (e.clientY - ringY) * 0.12;
-          gsap.set(ring, { x: ringX, y: ringY });
-        });
-      }
-
       // ── Evidence pinned carousel ────────────────────────────
       const stickyOuter = document.getElementById('evidence-sticky-outer');
       const panels      = document.getElementById('evidence-panels');
@@ -314,14 +301,6 @@ export default function SiteScripts() {
         });
       });
 
-      // ── Hero cursor glow ────────────────────────────────────
-      const hero = document.getElementById('hero');
-      if (hero) {
-        hero.addEventListener('mousemove', (e) => {
-          hero.style.setProperty('--x', `${e.clientX}px`);
-          hero.style.setProperty('--y', `${e.clientY}px`);
-        }, { passive: true });
-      }
     }
 
     function revealHero(gsap: typeof import('gsap').default) {

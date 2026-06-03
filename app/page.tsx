@@ -1,6 +1,5 @@
 import SmoothScroll  from '@/components/SmoothScroll';
 import Preloader     from '@/components/Preloader';
-import Cursor        from '@/components/Cursor';
 import Nav           from '@/components/Nav';
 import Hero          from '@/components/Hero';
 import Marquee       from '@/components/Marquee';
@@ -19,7 +18,6 @@ export default function Page() {
   return (
     <SmoothScroll>
       <Preloader />
-      <Cursor />
       <Nav />
       <Hero />
       <Marquee />

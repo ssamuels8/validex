@@ -1,239 +1,257 @@
 'use client';
 
-import { Suspense, useRef, useMemo } from 'react';
+import { useRef, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
+import { Environment } from '@react-three/drei';
 import * as THREE from 'three';
 
-const BW = 1.4;
-const BH = 2.8;
-const BD = 1.4;
-const COLS = 3;
-const ROWS = 6;
-const PANEL_W = BW / COLS - 0.04;
-const PANEL_H = BH / ROWS - 0.04;
-const FALL_START = 2.0;
-const ROTATE_START = 4.8;
+/* ── Constants ───────────────────────────────────────────── */
+const COLS  = 4;
+const ROWS  = 2;
+const DEPTH = 8;
+const BOX_W = 1.0;
+const BOX_H = 0.6;
+const BOX_D = 1.2;
+const GAP   = 0.08;
 
-function rng(seed: number): number {
-  const s = Math.sin(seed + 1.5) * 43758.5453;
-  return s - Math.floor(s);
-}
+const STRIDE_X = BOX_W + GAP;
+const STRIDE_Y = BOX_H + GAP;
+const STRIDE_Z = BOX_D + GAP;
 
-interface PanelDef {
-  initPos: [number, number, number];
-  initRot: [number, number, number];
-  vx: number;
-  vy0: number;
-  vRx: number;
-  vRz: number;
-  delay: number;
-}
+const TOTAL_W = COLS  * STRIDE_X - GAP;
+const TOTAL_H = ROWS  * STRIDE_Y - GAP;
+const TOTAL_D = DEPTH * STRIDE_Z - GAP;
 
-function buildPanelDefs(): PanelDef[] {
-  const defs: PanelDef[] = [];
-  let s = 0;
+const TOP_Y   = TOTAL_H / 2;   // top face y (structure centred at origin)
 
-  const makePanels = (
-    positionFn: (r: number, c: number) => [number, number, number],
-    rotFn: () => [number, number, number],
-    cCount: number,
-    vxSign: number,
-  ) => {
-    for (let r = 0; r < ROWS; r++) {
-      for (let c = 0; c < cCount; c++) {
+const PARTICLE_COUNT = 2000;
+const ASSEMBLE_DURATION = 2.0;
+
+/* ── Box position array ──────────────────────────────────── */
+interface BoxDef { x: number; y: number; z: number; idx: number }
+
+function buildBoxDefs(): BoxDef[] {
+  const defs: BoxDef[] = [];
+  let idx = 0;
+  for (let row = 0; row < ROWS; row++) {
+    for (let col = 0; col < COLS; col++) {
+      for (let d = 0; d < DEPTH; d++) {
         defs.push({
-          initPos: positionFn(r, c),
-          initRot: rotFn(),
-          vx: (rng(s++) - 0.5) * 2 * vxSign,
-          vy0: rng(s++) * 0.4,
-          vRx: (rng(s++) - 0.5) * 9,
-          vRz: (rng(s++) - 0.5) * 6,
-          delay: rng(s++) * 1.0,
+          x: (col - (COLS  - 1) / 2) * STRIDE_X,
+          y: (row - (ROWS  - 1) / 2) * STRIDE_Y,
+          z: (d   - (DEPTH - 1) / 2) * STRIDE_Z,
+          idx: idx++,
         });
       }
     }
-  };
-
-  // Front face
-  makePanels(
-    (r, c) => [
-      -BW / 2 + (c + 0.5) * (BW / COLS),
-      -BH / 2 + (r + 0.5) * (BH / ROWS),
-      BD / 2 + 0.007,
-    ],
-    () => [0, 0, 0],
-    COLS,
-    0,
-  );
-
-  // Left face
-  makePanels(
-    (r, c) => [
-      -BW / 2 - 0.007,
-      -BH / 2 + (r + 0.5) * (BH / ROWS),
-      -BD / 2 + (c + 0.5) * (BD / 3),
-    ],
-    () => [0, Math.PI / 2, 0],
-    3,
-    -1,
-  );
-
-  // Right face
-  makePanels(
-    (r, c) => [
-      BW / 2 + 0.007,
-      -BH / 2 + (r + 0.5) * (BH / ROWS),
-      -BD / 2 + (c + 0.5) * (BD / 3),
-    ],
-    () => [0, -Math.PI / 2, 0],
-    3,
-    1,
-  );
-
+  }
   return defs;
 }
 
-function Scene() {
-  const groupRef  = useRef<THREE.Group>(null);
-  const panelDefs = useMemo(buildPanelDefs, []);
-  const panelRefs = useRef<(THREE.Mesh | null)[]>(new Array(panelDefs.length).fill(null));
+/* ── Scene (inside Canvas) ───────────────────────────────── */
+interface SceneProps {
+  isDragging:    React.MutableRefObject<boolean>;
+  prevPointer:   React.MutableRefObject<{ x: number; y: number }>;
+  manualRot:     React.MutableRefObject<{ x: number; y: number }>;
+}
+
+function Scene({ isDragging, manualRot }: SceneProps) {
+  const groupRef      = useRef<THREE.Group>(null);
+  const vegRef        = useRef<THREE.Points>(null);
+  const vegGeoRef     = useRef<THREE.BufferGeometry>(null);
+
+  const boxes = useMemo(buildBoxDefs, []);
+  const meshRefs = useRef<(THREE.Mesh | null)[]>(new Array(boxes.length).fill(null));
+
+  /* shared geometry + materials */
+  const boxGeo = useMemo(
+    () => new THREE.BoxGeometry(BOX_W, BOX_H, BOX_D),
+    [],
+  );
+  const edgeGeo = useMemo(
+    () => new THREE.EdgesGeometry(new THREE.BoxGeometry(BOX_W, BOX_H, BOX_D)),
+    [],
+  );
+  const glassMat = useMemo(
+    () =>
+      new THREE.MeshPhysicalMaterial({
+        transmission:   0.95,
+        roughness:      0.05,
+        thickness:      0.5,
+        ior:            1.5,
+        color:          new THREE.Color('#88ffaa'),
+        iridescence:    0.3,
+        iridescenceIOR: 1.3,
+        transparent:    true,
+        opacity:        0.85,
+        side:           THREE.FrontSide,
+      }),
+    [],
+  );
+  const edgeMat = useMemo(
+    () =>
+      new THREE.LineBasicMaterial({
+        color:       new THREE.Color('#4FAE7E'),
+        transparent: true,
+        opacity:     0.4,
+      }),
+    [],
+  );
+
+  /* vegetation particle positions */
+  const vegPositions = useMemo(() => {
+    const pos = new Float32Array(PARTICLE_COUNT * 3);
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+      pos[i * 3]     = (Math.random() - 0.5) * TOTAL_W;
+      pos[i * 3 + 1] = TOP_Y + Math.random() * 0.8;
+      pos[i * 3 + 2] = (Math.random() - 0.5) * TOTAL_D;
+    }
+    return pos;
+  }, []);
+
+  /* base rotations so the structure starts at the nice angle */
+  const baseRotX = useRef(0.18);
+  const baseRotY = useRef(-0.35);
 
   useFrame((state, delta) => {
     const t     = state.clock.getElapsedTime();
     const group = groupRef.current;
     if (!group) return;
 
-    // Phase 1 — rise from below
-    if (t < 1.5) {
-      const ease = 1 - Math.pow(1 - t / 1.5, 3);
-      group.position.y = (ease - 1) * 3.0;
+    /* ── Assembly animation ── */
+    boxes.forEach((box, i) => {
+      const mesh = meshRefs.current[i];
+      if (!mesh) return;
+      const delay    = box.idx * 0.055;
+      const localT   = Math.max(0, t - delay);
+      if (localT < ASSEMBLE_DURATION) {
+        const p    = localT / ASSEMBLE_DURATION;
+        const ease = 1 - Math.pow(1 - p, 3);
+        mesh.position.y = box.y + (ease - 1) * 8;
+      } else {
+        mesh.position.y = box.y;
+      }
+    });
+
+    /* ── Vegetation drift ── */
+    if (vegGeoRef.current) {
+      const pos  = vegGeoRef.current.getAttribute('position') as THREE.BufferAttribute;
+      const arr  = pos.array as Float32Array;
+      const speed = 0.012;
+      for (let i = 0; i < PARTICLE_COUNT; i++) {
+        arr[i * 3 + 1] += speed * delta * 60 * 0.016;
+        if (arr[i * 3 + 1] > TOP_Y + 2.5) {
+          arr[i * 3 + 1] = TOP_Y;
+        }
+      }
+      pos.needsUpdate = true;
+
+      /* fade in vegetation */
+      if (vegRef.current) {
+        const mat = vegRef.current.material as THREE.PointsMaterial;
+        if (t < 1.5) {
+          mat.opacity = 0;
+        } else if (t < 2.5) {
+          mat.opacity = (t - 1.5);
+        }
+      }
+    }
+
+    /* ── Rotation ── */
+    if (isDragging.current) {
+      /* apply accumulated manual rotation */
+      baseRotY.current += manualRot.current.y;
+      baseRotX.current += manualRot.current.x;
+      manualRot.current.x = 0;
+      manualRot.current.y = 0;
     } else {
-      group.position.y = 0;
+      /* slow auto-spin when not dragging */
+      baseRotY.current += delta * 0.0015 * 60 * 0.016;
     }
 
-    // Phase 2 — facade shatters
-    if (t >= FALL_START) {
-      panelDefs.forEach((def, i) => {
-        const mesh = panelRefs.current[i];
-        if (!mesh) return;
-        const ft = Math.max(0, t - FALL_START - def.delay);
-        if (ft === 0) return;
+    group.rotation.y = baseRotY.current;
+    group.rotation.x = THREE.MathUtils.clamp(baseRotX.current, -0.6, 0.6);
 
-        mesh.position.x = def.initPos[0] + def.vx * ft;
-        mesh.position.y = def.initPos[1] + def.vy0 * ft - 4.5 * ft * ft;
-        mesh.position.z = def.initPos[2];
-        mesh.rotation.x = def.initRot[0] + def.vRx * ft;
-        mesh.rotation.z = def.initRot[2] + def.vRz * ft;
-
-        const mat = mesh.material as THREE.MeshStandardMaterial;
-        mat.opacity = Math.max(0, 1 - ft * 0.85);
-      });
-    }
-
-    // Phase 3 — slow rotation
-    if (t >= ROTATE_START) {
-      group.rotation.y += delta * 0.16;
-    }
-
-    // Subtle breathing scale
-    if (t >= ROTATE_START) {
-      const breathe = 1 + Math.sin(t * 0.8) * 0.005;
-      group.scale.setScalar(breathe);
-    }
+    /* ── Breathing float ── */
+    group.position.y = Math.sin(t * 0.8) * 0.08;
   });
 
   return (
-    <group ref={groupRef}>
-      {/* Dark industrial core */}
-      <mesh>
-        <boxGeometry args={[BW, BH, BD]} />
-        <meshStandardMaterial color="#0e110f" roughness={0.95} metalness={0.05} />
-      </mesh>
-
-      {/* Edge highlight lines */}
-      <lineSegments>
-        <edgesGeometry args={[new THREE.BoxGeometry(BW, BH, BD)]} />
-        <lineBasicMaterial color="#1a261e" />
-      </lineSegments>
-
-      {/* Green facade panels */}
-      {panelDefs.map((def, i) => (
-        <mesh
+    <group ref={groupRef} rotation={[baseRotX.current, baseRotY.current, 0]}>
+      {/* Glass boxes */}
+      {boxes.map((box, i) => (
+        <group
           key={i}
-          ref={(el) => { panelRefs.current[i] = el; }}
-          position={def.initPos}
-          rotation={def.initRot}
+          ref={(el) => {
+            if (el) meshRefs.current[i] = el.children[0] as THREE.Mesh;
+          }}
+          position={[box.x, box.y - 8, box.z]}
         >
-          <planeGeometry args={[PANEL_W, PANEL_H]} />
-          <meshStandardMaterial
-            color="#2D5A42"
-            roughness={0.6}
-            metalness={0.4}
-            transparent
-            opacity={1}
-          />
-        </mesh>
+          <mesh geometry={boxGeo} material={glassMat} />
+          <lineSegments geometry={edgeGeo} material={edgeMat} />
+        </group>
       ))}
+
+      {/* Vegetation particles */}
+      <points ref={vegRef}>
+        <bufferGeometry ref={vegGeoRef}>
+          <bufferAttribute
+            attach="attributes-position"
+            args={[vegPositions, 3]}
+          />
+        </bufferGeometry>
+        <pointsMaterial
+          color="#4FAE7E"
+          size={0.04}
+          sizeAttenuation
+          transparent
+          opacity={0}
+          depthWrite={false}
+        />
+      </points>
     </group>
   );
 }
 
-function Particles() {
-  const ref   = useRef<THREE.Points>(null);
-  const count = 220;
-
-  const positions = useMemo(() => {
-    const pos = new Float32Array(count * 3);
-    for (let i = 0; i < count; i++) {
-      pos[i * 3]     = (Math.random() - 0.5) * 22;
-      pos[i * 3 + 1] = (Math.random() - 0.5) * 16;
-      pos[i * 3 + 2] = (Math.random() - 0.5) * 14 - 4;
-    }
-    return pos;
-  }, []);
-
-  useFrame((state) => {
-    if (ref.current) {
-      ref.current.rotation.y = state.clock.getElapsedTime() * 0.018;
-    }
-  });
-
-  return (
-    <points ref={ref}>
-      <bufferGeometry>
-        <bufferAttribute
-          attach="attributes-position"
-          args={[positions, 3]}
-        />
-      </bufferGeometry>
-      <pointsMaterial size={0.014} color="#ECE7DD" transparent opacity={0.12} />
-    </points>
-  );
-}
-
-function SceneContent() {
-  return (
-    <>
-      <ambientLight intensity={0.04} />
-      <pointLight position={[4, 5, 4]} color="#4FAE7E" intensity={3} decay={2} />
-      <pointLight position={[-5, 3, -2]} color="#ECE7DD" intensity={0.12} decay={2} />
-      <pointLight position={[0, -4, 3]} color="#142019" intensity={1} decay={2} />
-      <Scene />
-      <Particles />
-    </>
-  );
-}
-
+/* ── Main export ─────────────────────────────────────────── */
 export default function HeroScene() {
+  const isDragging  = useRef(false);
+  const prevPointer = useRef({ x: 0, y: 0 });
+  const manualRot   = useRef({ x: 0, y: 0 });
+
   return (
-    <Canvas
-      camera={{ position: [0, -0.6, 6.5], fov: 48 }}
-      gl={{ alpha: true, antialias: true }}
-      style={{ background: 'transparent', width: '100%', height: '100%' }}
+    <div
+      style={{ position: 'absolute', inset: 0 }}
+      onPointerDown={(e) => {
+        isDragging.current = true;
+        prevPointer.current = { x: e.clientX, y: e.clientY };
+        (e.currentTarget as HTMLDivElement).setPointerCapture(e.pointerId);
+      }}
+      onPointerMove={(e) => {
+        if (!isDragging.current) return;
+        manualRot.current.y += (e.clientX - prevPointer.current.x) * 0.008;
+        manualRot.current.x += (e.clientY - prevPointer.current.y) * 0.004;
+        prevPointer.current = { x: e.clientX, y: e.clientY };
+      }}
+      onPointerUp={() => { isDragging.current = false; }}
+      onPointerLeave={() => { isDragging.current = false; }}
     >
-      <Suspense fallback={null}>
-        <SceneContent />
-      </Suspense>
-    </Canvas>
+      <Canvas
+        camera={{ position: [8, 6, 10], fov: 45 }}
+        gl={{ alpha: true, antialias: true }}
+        style={{ width: '100%', height: '100%' }}
+      >
+        <ambientLight intensity={0.3} />
+        <directionalLight position={[5, 8, 3]} intensity={1.2} color="#ffffff" />
+        <pointLight position={[-3, 4, -2]} intensity={0.8} color="#4FAE7E" />
+        <pointLight position={[3, -2, 4]} intensity={0.4} color="#88aaff" />
+        <Environment preset="city" />
+        <Scene
+          isDragging={isDragging}
+          prevPointer={prevPointer}
+          manualRot={manualRot}
+        />
+      </Canvas>
+    </div>
   );
 }
