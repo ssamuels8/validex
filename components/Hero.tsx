@@ -1,13 +1,20 @@
 'use client';
 
+import React from 'react';
 import Image from 'next/image';
 import { ArrowDown } from 'lucide-react';
 import { AnimatedShinyText } from './ui/animated-shiny-text';
 
 const GRADIENT = 'linear-gradient(90deg, #15130E, #2E5E3E, #15130E)';
-const TEXT_CLS =
-  'display font-extrabold tracking-[-0.03em] leading-[0.9] text-[clamp(2.6rem,8.5vw,9.5rem)] text-left';
 const WRAP_CLS = 'justify-start items-start py-0 text-left';
+
+// fontFamily + fontSize live in .hero-headline-arial CSS (needs !important for fontFamily).
+// fontWeight / letterSpacing / lineHeight stay inline (no !important conflict).
+const HEADLINE_STYLE: React.CSSProperties = {
+  fontWeight: 700,
+  letterSpacing: '-0.05em',
+  lineHeight: 0.82,
+};
 
 export default function Hero() {
   return (
@@ -16,7 +23,7 @@ export default function Hero() {
       {/* Warm radial glow */}
       <div className="hero-atmosphere" aria-hidden="true" />
 
-      {/* Text block — vertically centered left, z2; first in DOM so mobile stacks above object */}
+      {/* Text block — vertically centered, far left, z2 */}
       <div className="hero-text">
         <span className="hero-pill">
           Independent Sustainability Measurement
@@ -28,7 +35,8 @@ export default function Hero() {
             gradientColors={GRADIENT}
             gradientAnimationDuration={4}
             hoverEffect={false}
-            textClassName={TEXT_CLS}
+            textClassName="text-left hero-headline-arial"
+            textStyle={HEADLINE_STYLE}
             className={WRAP_CLS}
           >
             They Promise,
@@ -37,7 +45,8 @@ export default function Hero() {
             gradientColors={GRADIENT}
             gradientAnimationDuration={4}
             hoverEffect={false}
-            textClassName={TEXT_CLS}
+            textClassName="text-left hero-headline-arial"
+            textStyle={HEADLINE_STYLE}
             className={WRAP_CLS}
           >
             We Measure.
@@ -50,7 +59,7 @@ export default function Hero() {
         </p>
       </div>
 
-      {/* Object — right-anchored, large, bleeds off right edge */}
+      {/* Object — right-anchored, oversized, ambient-animated backdrop */}
       <div className="hero-image-wrap" id="hero-image-wrap">
         <div className="hero-object-shadow" aria-hidden="true" />
         <div className="hero-image-tilt" id="hero-image-tilt">

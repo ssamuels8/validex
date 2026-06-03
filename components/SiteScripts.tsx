@@ -327,8 +327,8 @@ export default function SiteScripts() {
           const dx = (me.clientX - r.width / 2) / (r.width / 2);
           const dy = (me.clientY - r.height / 2) / (r.height / 2);
           gsap.to(tiltEl, {
-            rotateX: dy * -4,
-            rotateY: dx * 4,
+            rotateX: dy * -3,
+            rotateY: dx * 3,
             duration: 0.5,
             ease: 'power2.out',
             transformPerspective: 900,

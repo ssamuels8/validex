@@ -8,6 +8,7 @@ interface AnimatedShinyTextProps {
   children: React.ReactNode;
   className?: string;
   textClassName?: string;
+  textStyle?: React.CSSProperties;
   gradientColors?: string;
   gradientAnimationDuration?: number;
   hoverEffect?: boolean;
@@ -17,6 +18,7 @@ export function AnimatedShinyText({
   children,
   className,
   textClassName,
+  textStyle,
   gradientColors = 'linear-gradient(90deg, #000, #fff, #000)',
   gradientAnimationDuration = 3,
   hoverEffect = false,
@@ -33,6 +35,7 @@ export function AnimatedShinyText({
           color: 'transparent',
           WebkitTextFillColor: 'transparent',
           display: 'block',
+          ...textStyle,
         }}
         animate={!hoverEffect ? { backgroundPosition: ['0% 50%', '-200% 50%'] } : undefined}
         transition={
