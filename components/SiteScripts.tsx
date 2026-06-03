@@ -288,12 +288,12 @@ export default function SiteScripts() {
         ctaLines.forEach((l) => { l.style.transform = 'none'; });
       }
 
-      // ── Magnetic buttons ──────────────────────────────────────
-      document.querySelectorAll<HTMLElement>('#hero-cta-btn, #cta-main-btn').forEach((btn) => {
+      // ── Magnetic buttons (nav pill + CTA section) ───────────────
+      document.querySelectorAll<HTMLElement>('#nav-pill-cta, #cta-main-btn').forEach((btn) => {
         btn.addEventListener('mousemove', (e) => {
           const r = btn.getBoundingClientRect();
-          const dx = (e.clientX - (r.left + r.width / 2)) * 0.28;
-          const dy = (e.clientY - (r.top + r.height / 2)) * 0.28;
+          const dx = (e.clientX - (r.left + r.width / 2)) * 0.22;
+          const dy = (e.clientY - (r.top + r.height / 2)) * 0.22;
           gsap.to(btn, { x: dx, y: dy, duration: 0.3, ease: 'power2.out' });
         });
         btn.addEventListener('mouseleave', () => {
@@ -301,8 +301,9 @@ export default function SiteScripts() {
         });
       });
 
-      // ── Hero parallax ────────────────────────────────────────
+      // ── Hero scroll parallax: object drifts up + fades, headline drifts up ──
       const imgWrap = document.getElementById('hero-image-wrap');
+      const heroText = document.querySelector<HTMLElement>('.hero-text');
       if (imgWrap && !prefersReduced) {
         ScrollTrigger.create({
           trigger: '#hero',
@@ -310,58 +311,86 @@ export default function SiteScripts() {
           end: 'bottom top',
           scrub: true,
           onUpdate(self: { progress: number }) {
-            gsap.set(imgWrap, { y: -120 * self.progress });
+            const p = self.progress;
+            gsap.set(imgWrap, { y: -120 * p, opacity: 1 - p * 0.7 });
+            if (heroText) gsap.set(heroText, { y: -60 * p });
           },
         });
       }
 
-      // ── Hero mouse tilt ───────────────────────────────────────
+      // ── Hero mouse tilt (disabled on touch devices) ──────────
       const heroSection = document.getElementById('hero');
       const tiltEl = document.getElementById('hero-image-tilt');
-      if (heroSection && tiltEl && !prefersReduced) {
+      const isTouchDevice = window.matchMedia('(pointer: coarse)').matches;
+      if (heroSection && tiltEl && !prefersReduced && !isTouchDevice) {
         heroSection.addEventListener('mousemove', (e: Event) => {
           const me = e as MouseEvent;
           const r = heroSection.getBoundingClientRect();
           const dx = (me.clientX - r.width / 2) / (r.width / 2);
           const dy = (me.clientY - r.height / 2) / (r.height / 2);
           gsap.to(tiltEl, {
-            rotateX: dy * -5,
-            rotateY: dx * 5,
-            duration: 0.4,
+            rotateX: dy * -3.5,
+            rotateY: dx * 3.5,
+            duration: 0.5,
             ease: 'power2.out',
-            transformPerspective: 800,
+            transformPerspective: 900,
           });
         });
         heroSection.addEventListener('mouseleave', () => {
-          gsap.to(tiltEl, { rotateX: 0, rotateY: 0, duration: 0.6 });
+          gsap.to(tiltEl, { rotateX: 0, rotateY: 0, duration: 0.8, ease: 'power2.out' });
         });
       }
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     function revealHero(gsap: any) {
+      const pill      = document.querySelector<HTMLElement>('.hero-pill');
+      const words     = document.querySelectorAll<HTMLElement>('.hero-headline .line-mask-inner');
+      const imgWrap   = document.getElementById('hero-image-wrap');
+      const heroSub   = document.querySelector<HTMLElement>('.hero-sub');
+      const scrollCue = document.getElementById('hero-scroll-cue');
+
       if (prefersReduced) {
-        document.querySelectorAll<HTMLElement>('.hero-headline .line-mask-inner').forEach((w) => {
-          w.style.transform = 'none';
-        });
-        const pill = document.querySelector<HTMLElement>('.hero-pill');
-        const sub = document.querySelector<HTMLElement>('.hero-sub');
-        const cta = document.querySelector<HTMLElement>('.hero-cta-wrap');
+        words.forEach((w) => { w.style.transform = 'none'; });
         if (pill) pill.style.opacity = '1';
-        if (sub) sub.style.opacity = '1';
-        if (cta) cta.style.opacity = '1';
+        if (imgWrap) { imgWrap.style.opacity = '1'; imgWrap.style.transform = 'translateX(-50%)'; }
+        if (heroSub) heroSub.style.opacity = '1';
+        if (scrollCue) scrollCue.style.opacity = '1';
         return;
       }
-      const words = document.querySelectorAll<HTMLElement>('.hero-headline .line-mask-inner');
+
+      // t=0.0 — eyebrow pill
+      if (pill) gsap.fromTo(pill,
+        { opacity: 0, y: 12 },
+        { opacity: 1, y: 0, duration: 0.6, delay: 0.0, ease: 'power3.out' }
+      );
+
+      // t=0.15 — headline: each line mask-revealed, stagger 0.1s
       words.forEach((w, i) => {
-        gsap.to(w, { y: 0, duration: 1.0, delay: 0.05 + i * 0.12, ease: 'power4.out' });
+        gsap.to(w, { y: 0, duration: 0.9, delay: 0.15 + i * 0.1, ease: 'power4.out' });
       });
-      const pill = document.querySelector<HTMLElement>('.hero-pill');
-      const sub = document.querySelector<HTMLElement>('.hero-sub');
-      const cta = document.querySelector<HTMLElement>('.hero-cta-wrap');
-      if (pill) gsap.to(pill, { opacity: 1, duration: 0.6, delay: 0.5 });
-      if (sub) gsap.to(sub, { opacity: 1, duration: 0.8, delay: 0.75, ease: 'power2.out' });
-      if (cta) gsap.to(cta, { opacity: 1, duration: 0.8, delay: 0.95, ease: 'power2.out' });
+
+      // t=0.40 — object RISES from below (empire-style)
+      if (imgWrap) gsap.fromTo(imgWrap,
+        { y: 80, scale: 0.94, opacity: 0 },
+        {
+          y: 0, scale: 1, opacity: 1,
+          duration: 1.5, delay: 0.40,
+          ease: 'power3.out',
+          transformOrigin: 'center bottom',
+          clearProps: 'scale',
+        }
+      );
+
+      // t=1.0 — sub-line + scroll cue
+      if (heroSub) gsap.fromTo(heroSub,
+        { opacity: 0, y: 10 },
+        { opacity: 1, y: 0, duration: 0.6, delay: 1.0, ease: 'power2.out' }
+      );
+      if (scrollCue) gsap.fromTo(scrollCue,
+        { opacity: 0 },
+        { opacity: 1, duration: 0.6, delay: 1.0, ease: 'power2.out' }
+      );
     }
 
     init();
