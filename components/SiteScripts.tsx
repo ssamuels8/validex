@@ -112,26 +112,44 @@ export default function SiteScripts() {
         mWords.forEach((w) => { w.style.opacity = '1'; w.style.transform = 'none'; });
       }
 
-      // ── Problem stat counter ─────────────────────────────────
-      const statEl = document.querySelector<HTMLElement>('.problem-stat');
-      if (statEl && !prefersReduced) {
-        let fired = false;
-        ScrollTrigger.create({
-          trigger: statEl,
-          start: 'top 78%',
-          onEnter: () => {
-            if (fired) return;
-            fired = true;
-            const obj = { val: 0 };
-            gsap.to(obj, {
-              val: 85,
-              duration: 1.2,
-              ease: 'power2.out',
-              onUpdate() { statEl.textContent = Math.round(obj.val) + '%'; },
-              onComplete() { statEl.textContent = '85%'; },
-            });
-          },
-        });
+      // ── Market Failure: stat count-up + pull-quote reveal ───
+      const counterEl = document.getElementById('problem-counter');
+      const pullEl = document.querySelector<HTMLElement>('.problem-pull');
+      if (prefersReduced) {
+        if (counterEl) counterEl.textContent = '85';
+        if (pullEl) { pullEl.style.opacity = '1'; pullEl.style.transform = 'none'; }
+      } else {
+        if (counterEl) {
+          let fired = false;
+          ScrollTrigger.create({
+            trigger: '#problem',
+            start: 'top 75%',
+            onEnter: () => {
+              if (fired) return;
+              fired = true;
+              const obj = { val: 0 };
+              gsap.to(obj, {
+                val: 85,
+                duration: 1.4,
+                ease: 'power2.out',
+                onUpdate() { counterEl.textContent = String(Math.round(obj.val)); },
+                onComplete() { counterEl.textContent = '85'; },
+              });
+            },
+          });
+        }
+        if (pullEl) {
+          ScrollTrigger.create({
+            trigger: pullEl,
+            start: 'top 78%',
+            onEnter: () => {
+              gsap.fromTo(pullEl,
+                { opacity: 0, y: 30 },
+                { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' }
+              );
+            },
+          });
+        }
       }
 
       // ── Case study cards stagger reveal ────────────────────────
