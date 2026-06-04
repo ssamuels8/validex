@@ -11,8 +11,8 @@ export default function CtaSection() {
           We are onboarding a small number of partners.
           No forms. Just a conversation.
         </p>
-        <a href="mailto:hello@validex.com" className="cta-btn" id="cta-main-btn">
-          HELLO@VALIDEX.COM ↗
+        <a href="#contact" className="cta-btn" id="cta-main-btn">
+          Get In Touch ↗
         </a>
       </div>
     </section>

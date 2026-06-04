@@ -562,8 +562,8 @@ export default async function CaseStudyPage({
         )}
 
         <div className="cs-cta">
-          <a href="mailto:hello@validex.com" className="cs-cta-link">
-            hello@validex.com ↗
+          <a href="#contact" className="cs-cta-link">
+            Get In Touch ↗
           </a>
           <p className="cta-note">No forms. No demos. A conversation.</p>
         </div>
