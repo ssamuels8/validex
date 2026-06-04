@@ -211,6 +211,56 @@ export default function SiteScripts() {
         diagNodes.forEach((n) => n.classList.add('visible'));
       }
 
+      // ── Score section 2-col reveal ───────────────────────────
+      const scoreCols = document.querySelector<HTMLElement>('.score-cols');
+      if (scoreCols) {
+        const leftEls = scoreCols.querySelectorAll<HTMLElement>('.score-fade-up');
+        const scorecardWrapEl = document.getElementById('scorecard-wrapper');
+        const depthPanel = scoreCols.querySelector<HTMLElement>('.score-depth-panel');
+
+        if (leftEls.length) {
+          ScrollTrigger.create({
+            trigger: scoreCols,
+            start: 'top 75%',
+            once: true,
+            onEnter: () => {
+              gsap.to(leftEls, {
+                opacity: 1, y: 0, duration: 0.8,
+                ease: 'power3.out', stagger: 0.12,
+              });
+            },
+          });
+        }
+        if (scorecardWrapEl) {
+          gsap.set(scorecardWrapEl, { opacity: 0, y: 40 });
+          ScrollTrigger.create({
+            trigger: scoreCols,
+            start: 'top 75%',
+            once: true,
+            onEnter: () => {
+              gsap.to(scorecardWrapEl, {
+                opacity: 1, y: 0, duration: 1,
+                ease: 'power3.out', delay: 0.2,
+              });
+            },
+          });
+        }
+        if (depthPanel) {
+          gsap.set(depthPanel, { y: -24 });
+          ScrollTrigger.create({
+            trigger: scoreCols,
+            start: 'top 75%',
+            once: true,
+            onEnter: () => {
+              gsap.to(depthPanel, {
+                y: 0, duration: 1.2,
+                ease: 'power3.out', delay: 0.3,
+              });
+            },
+          });
+        }
+      }
+
       // ── Scorecard animations ─────────────────────────────────
       const scorecardWrapper = document.getElementById('scorecard-wrapper');
       if (scorecardWrapper) {

@@ -837,26 +837,48 @@ h1, h2, h3, h4, h5, h6 {
 /* ── Score ──────────────────────────────────────────────── */
 .score {
   background: radial-gradient(ellipse at 50% 35%, var(--ink-soft) 0%, var(--ink) 65%);
-  padding: 20vh 6vw;
+  padding: clamp(14vh, 18vh, 20vh) 6vw;
   border-top: 1px solid var(--line-dark);
 }
 .score-inner {
-  max-width: 640px;
+  max-width: 1280px;
   margin: 0 auto;
-  text-align: center;
+}
+.score-cols {
+  display: grid;
+  grid-template-columns: 0.85fr 1.15fr;
+  gap: clamp(3rem, 5vw, 5rem);
+  align-items: center;
+}
+.score-left {
+  text-align: left;
+}
+.score-right {
+  position: relative;
+}
+.score-depth-panel {
+  position: absolute;
+  bottom: -6%;
+  right: -5%;
+  width: 100%;
+  height: 100%;
+  border-radius: 22px;
+  background: rgba(242, 238, 228, 0.04);
+  filter: blur(3px);
+  z-index: 0;
 }
 .score-eyebrow {
   display: block;
   font-size: 0.72rem;
   font-weight: 500;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--moss);
   margin-bottom: 2rem;
   font-family: var(--font-mono), 'DM Mono', monospace !important;
 }
 .score-headline {
-  font-size: var(--h2);
+  font-size: clamp(2.5rem, 4.5vw, 4rem);
   font-weight: 500;
   line-height: 0.98;
   letter-spacing: -0.03em;
@@ -867,13 +889,13 @@ h1, h2, h3, h4, h5, h6 {
 .score-sub {
   font-size: var(--body);
   color: var(--on-dark);
-  margin-bottom: 3rem;
+  margin-bottom: 2rem;
   line-height: 1.6;
+  max-width: 40ch;
 }
 .scorecard-wrapper {
   position: relative;
-  max-width: 580px;
-  margin: 0 auto 1rem;
+  z-index: 10;
 }
 .scorecard-svg-border {
   position: absolute;
@@ -890,6 +912,9 @@ h1, h2, h3, h4, h5, h6 {
   position: relative;
   z-index: 1;
   border: 1px solid var(--line-dark);
+  border-radius: 22px;
+  box-shadow: 0 40px 90px rgba(0, 0, 0, 0.38);
+  overflow: hidden;
 }
 .scorecard-head {
   display: flex;
@@ -1032,6 +1057,7 @@ h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-mono), 'DM Mono', monospace !important;
 }
 .grade-tooltip.tip-visible { opacity: 1; }
+.score-fade-up { opacity: 0; transform: translateY(30px); }
 .score-disclaimer {
   font-size: 0.58rem;
   letter-spacing: 0.08em;
@@ -1287,6 +1313,14 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--on-dark);
   margin-top: 1.25rem;
   font-family: var(--font-mono), 'DM Mono', monospace !important;
+}
+
+/* ── Score 2-col stack ───────────────────────────────────── */
+@media (max-width: 960px) {
+  .score-cols { grid-template-columns: 1fr; }
+  .score-sub { max-width: none; }
+  .scorecard-wrapper { max-width: 100%; }
+  .score-depth-panel { display: none; }
 }
 
 /* ── Responsive ─────────────────────────────────────────── */
