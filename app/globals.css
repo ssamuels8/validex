@@ -26,6 +26,7 @@ html, body, * {
   --ink-soft:    #232019;
   --moss:        #2E5E3E;
   --moss-bright: #4A8A5E;
+  --moss-deep:   #1A4D33;  /* sampled from dashboard dark-green card */
   --on-dark:     rgba(242,238,228,0.62);
   --on-light:    rgba(21,19,14,0.60);
   --line-dark:   rgba(242,238,228,0.12);
@@ -43,6 +44,15 @@ html, body, * {
   --h2:   clamp(2.5rem, 6vw, 5.5rem);
   --stat: clamp(7rem, 18vw, 19rem);
   --body: 1.0625rem;
+
+  /* Motion system — one shared vocabulary, reused everywhere */
+  --ease-reveal: cubic-bezier(0.16, 1, 0.3, 1);  /* expo-out: big reveals */
+  --ease-ui:     cubic-bezier(0.4, 0, 0.2, 1);   /* fast UI feedback */
+  --dur-slow: 0.9s;   /* big reveals */
+  --dur-base: 0.6s;   /* secondary */
+  --dur-fast: 0.2s;   /* UI */
+  --stagger:  0.07s;  /* between grouped items */
+  --reveal-y: 24px;   /* default reveal distance */
 }
 
 /* ── Reset ──────────────────────────────────────────────── */
@@ -173,29 +183,18 @@ h1, h2, h3, h4, h5, h6 {
   position: relative;
   min-height: 100svh;
   overflow: hidden;
-  background: var(--ink);
+  background: var(--paper);
 }
 
-/* Shader sphere background — fills the hero, weighted slightly right so the
-   left-aligned headline sits over the calmer dark edge. z0, behind text. */
-.hero-shader {
+/* Warm radial glow — shifted right where object now lives */
+.hero-atmosphere {
   position: absolute;
   inset: 0;
   z-index: 0;
-  transform: translateX(13%);
-  pointer-events: none;
-}
-
-/* Legibility scrim — warm-black, weighted toward the text (left), fading to
-   transparent over the orb. Sits between shader (z0) and text (z10). */
-.hero-scrim {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
   background:
-    radial-gradient(ellipse 95% 85% at 22% 50%, rgba(21,19,14,0.55) 0%, rgba(21,19,14,0) 60%),
-    linear-gradient(180deg, rgba(21,19,14,0.40) 0%, transparent 26%, transparent 72%, rgba(21,19,14,0.34) 100%);
+    radial-gradient(ellipse 70% 60% at 80% 55%, rgba(247,243,234,0.9) 0%, transparent 65%),
+    radial-gradient(ellipse 45% 38% at 78% 70%, rgba(46,94,62,0.05) 0%, transparent 58%);
+  pointer-events: none;
 }
 
 /* Object — oversized backdrop, right-anchored, bleeds well off edges */
@@ -263,7 +262,7 @@ h1, h2, h3, h4, h5, h6 {
   top: 50%;
   transform: translateY(-50%);
   left: 0;
-  z-index: 10;
+  z-index: 2;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -272,39 +271,74 @@ h1, h2, h3, h4, h5, h6 {
   padding-right: 2rem;
   max-width: 85vw;
 }
-.hero-pill {
+/* Eyebrow — mono (via global [class*="-eyebrow"]), forest-green, the earned accent */
+.hero-eyebrow {
   display: inline-block;
-  background: var(--paper);
-  color: var(--ink);
-  border-radius: 999px;
-  padding: 0.4rem 1.1rem;
-  font-size: 0.7rem;
+  color: var(--moss-deep);
+  font-size: 0.72rem;
   font-weight: 500;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  margin-bottom: 2rem;
-  opacity: 0;
-  font-family: var(--font-mono), 'DM Mono', monospace !important;
+  margin-bottom: 2.25rem;
+  opacity: 0; /* GSAP reveals */
 }
-/* Wrapper div for the shiny headline */
+/* Headline — one bold element: solid warm near-black, Arial tight, line-mask reveal */
 .hero-headline {
-  opacity: 0; /* GSAP fades+rises this block on entrance */
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
   text-rendering: optimizeLegibility;
+}
+.hero-headline .line-mask {
+  /* a touch of bottom room so the mask never clips Arial descenders at lh 0.82 */
+  padding-bottom: 0.12em;
 }
 /* Arial override — needs !important to beat the global * { font-family: ... !important } rule.
    Min is 2.5rem so mobile (where 10.5vw < 4rem) gets a readable size. */
 .hero-headline-arial {
   font-family: Arial, Helvetica, sans-serif !important;
   font-size: clamp(2.5rem, 10.5vw, 12rem);
+  font-weight: 700;
+  letter-spacing: -0.05em;
+  line-height: 0.82;
+  color: var(--ink);
 }
 .hero-sub {
   font-size: 1rem;
   font-weight: 400;
   line-height: 1.6;
-  color: var(--on-dark);
-  max-width: 30ch;
+  color: var(--on-light);
+  max-width: 34ch;
   opacity: 0;
+}
+/* Instrument row — ledger-like proof device. One green tick = the single accent mark. */
+.hero-instrument {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.55rem 0.8rem;
+  margin-top: 2.5rem;
+  opacity: 0; /* GSAP reveals */
+  font-family: var(--font-mono), 'DM Mono', ui-monospace, monospace !important;
+  font-size: 0.66rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--on-light);
+}
+.hero-instrument-rule {
+  height: 1px;
+  width: clamp(28px, 4vw, 56px);
+  background: var(--line-light);
+  flex: none;
+}
+.hero-instrument-tick {
+  width: 6px;
+  height: 6px;
+  border-radius: 1px;
+  background: var(--moss);
+  flex: none;
+}
+.hero-instrument-sep {
+  opacity: 0.45;
 }
 
 /* Scroll cue — bottom center */
@@ -320,11 +354,11 @@ h1, h2, h3, h4, h5, h6 {
   width: 46px;
   height: 46px;
   border-radius: 50%;
-  border: 1px solid var(--line-dark);
+  border: 1px solid var(--line-light);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--paper);
+  color: var(--ink);
   cursor: pointer;
   animation: heroCueBob 1.8s ease-in-out infinite;
 }

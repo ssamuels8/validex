@@ -410,52 +410,74 @@ export default function SiteScripts() {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     function revealHero(gsap: any) {
-      const pill         = document.querySelector<HTMLElement>('.hero-pill');
-      const headlineBlock = document.getElementById('hero-headline');
-      const imgWrap      = document.getElementById('hero-image-wrap');
-      const heroSub      = document.querySelector<HTMLElement>('.hero-sub');
-      const scrollCue    = document.getElementById('hero-scroll-cue');
+      // The ONE orchestrated signature: a calm, staggered load reveal.
+      // Vocabulary = motion tokens: expo.out (--ease-reveal), 0.9s big / 0.6s secondary, 70ms cascade.
+      const eyebrow       = document.querySelector<HTMLElement>('.hero-eyebrow');
+      const headlineLines = document.querySelectorAll<HTMLElement>('#hero-headline .line-mask-inner');
+      const imgWrap       = document.getElementById('hero-image-wrap');
+      const heroSub       = document.querySelector<HTMLElement>('.hero-sub');
+      const instrument    = document.getElementById('hero-instrument');
+      const scrollCue     = document.getElementById('hero-scroll-cue');
 
       if (prefersReduced) {
-        if (pill) pill.style.opacity = '1';
-        if (headlineBlock) headlineBlock.style.opacity = '1';
+        if (eyebrow) eyebrow.style.opacity = '1';
+        headlineLines.forEach((l) => { l.style.transform = 'none'; });
         if (imgWrap) gsap.set(imgWrap, { opacity: 1 });
         if (heroSub) heroSub.style.opacity = '1';
+        if (instrument) instrument.style.opacity = '1';
         if (scrollCue) scrollCue.style.opacity = '1';
         return;
       }
 
-      // t=0.0 — eyebrow pill
-      if (pill) gsap.fromTo(pill,
-        { opacity: 0, y: 12 },
-        { opacity: 1, y: 0, duration: 0.6, delay: 0.0, ease: 'power3.out' }
+      const EASE = 'expo.out';                 // = cubic-bezier(0.16, 1, 0.3, 1)
+      const tl = gsap.timeline();
+
+      // Object — quiet, slow rise underneath, begins immediately (the brand backdrop, not the lead)
+      if (imgWrap) tl.fromTo(imgWrap,
+        { y: 60, scale: 0.96, opacity: 0 },
+        { y: 0, scale: 1, opacity: 1, duration: 1.6, ease: 'power3.out', clearProps: 'scale' },
+        0
       );
 
-      // t=0.15 — headline block fades+rises as one unit (no per-line mask — shiny gradient runs freely)
-      if (headlineBlock) gsap.fromTo(headlineBlock,
-        { opacity: 0, y: 30 },
-        { opacity: 1, y: 0, duration: 0.9, delay: 0.15, ease: 'power3.out' }
+      // Eyebrow
+      if (eyebrow) tl.fromTo(eyebrow,
+        { opacity: 0, y: 24 },
+        { opacity: 1, y: 0, duration: 0.6, ease: EASE },
+        0.1
       );
 
-      // t=0.40 — object rises from below
-      if (imgWrap) gsap.fromTo(imgWrap,
-        { y: 70, scale: 0.95, opacity: 0 },
-        {
-          y: 0, scale: 1, opacity: 1,
-          duration: 1.6, delay: 0.40,
-          ease: 'power3.out',
-          clearProps: 'scale',
-        }
+      // Headline — masked lines rise out of nothing, 70ms stagger (the centrepiece).
+      // Normalise GSAP's transform cache first: the CSS `translateY(102%)` initial state
+      // reads back from the computed matrix as a px `y` (~126px), which survives a
+      // yPercent tween and keeps the line clipped. Declaring y:0 + yPercent:102 in a set
+      // overrides that, so animating both to 0 actually lands the line in its mask.
+      if (headlineLines.length) {
+        gsap.set(headlineLines, { y: 0, yPercent: 102 });
+        tl.to(headlineLines,
+          { y: 0, yPercent: 0, duration: 0.9, ease: EASE, stagger: 0.07 },
+          0.2
+        );
+      }
+
+      // Sub-line
+      if (heroSub) tl.fromTo(heroSub,
+        { opacity: 0, y: 24 },
+        { opacity: 1, y: 0, duration: 0.6, ease: EASE },
+        0.65
       );
 
-      // t=1.0 — sub-line + scroll cue
-      if (heroSub) gsap.fromTo(heroSub,
-        { opacity: 0, y: 10 },
-        { opacity: 1, y: 0, duration: 0.6, delay: 1.0, ease: 'power2.out' }
+      // Instrument row
+      if (instrument) tl.fromTo(instrument,
+        { opacity: 0, y: 24 },
+        { opacity: 1, y: 0, duration: 0.6, ease: EASE },
+        0.78
       );
-      if (scrollCue) gsap.fromTo(scrollCue,
+
+      // Scroll cue
+      if (scrollCue) tl.fromTo(scrollCue,
         { opacity: 0 },
-        { opacity: 1, duration: 0.6, delay: 1.1, ease: 'power2.out' }
+        { opacity: 1, duration: 0.6, ease: EASE },
+        0.9
       );
     }
 

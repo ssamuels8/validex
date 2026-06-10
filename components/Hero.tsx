@@ -1,80 +1,59 @@
 'use client';
 
 import React from 'react';
-import dynamic from 'next/dynamic';
+import Image from 'next/image';
 import { ArrowDown } from 'lucide-react';
-import { AnimatedShinyText } from './ui/animated-shiny-text';
-
-// Shader is WebGL-only — load client-side, never SSR (avoids "window is not defined").
-const CelestialSphere = dynamic(
-  () => import('./ui/celestial-sphere-shader'),
-  { ssr: false }
-);
-
-// Light shiny gradient so the headline reads over the dark shader: off-white → moss → off-white.
-const GRADIENT = 'linear-gradient(90deg, #F2EEE4, #4A8A5E, #F2EEE4)';
-const WRAP_CLS = 'justify-start items-start py-0 text-left';
-
-// fontFamily + fontSize live in .hero-headline-arial CSS (needs !important for fontFamily).
-// fontWeight / letterSpacing / lineHeight stay inline (no !important conflict).
-const HEADLINE_STYLE: React.CSSProperties = {
-  fontWeight: 700,
-  letterSpacing: '-0.05em',
-  lineHeight: 0.82,
-};
 
 export default function Hero() {
   return (
-    <section className="hero hero--dark" id="hero">
+    <section className="hero" id="hero">
 
-      {/* Shader sphere — background, behind everything (z0) */}
-      <div className="hero-shader" aria-hidden="true">
-        <CelestialSphere
-          color1="#234A33"
-          color2="#E7E1D3"
-          cloudDensity={3.2}
-          glowIntensity={0.85}
-          rotationSpeed={0.06}
-        />
-      </div>
+      {/* Warm radial glow */}
+      <div className="hero-atmosphere" aria-hidden="true" />
 
-      {/* Warm-black scrim — sits between shader (z0) and text (z10) for legibility */}
-      <div className="hero-scrim" aria-hidden="true" />
-
-      {/* Text block — vertically centered, far left, z10 */}
+      {/* Text block — vertically centered, far left, z2 */}
       <div className="hero-text">
-        <span className="hero-pill">
+        <span className="hero-eyebrow">
           Independent Sustainability Measurement
         </span>
 
-        {/* Headline wrapper — GSAP fades+rises this whole block */}
-        <div className="hero-headline" id="hero-headline">
-          <AnimatedShinyText
-            gradientColors={GRADIENT}
-            gradientAnimationDuration={4}
-            hoverEffect={false}
-            textClassName="text-left hero-headline-arial"
-            textStyle={HEADLINE_STYLE}
-            className={WRAP_CLS}
-          >
-            They Promise,
-          </AnimatedShinyText>
-          <AnimatedShinyText
-            gradientColors={GRADIENT}
-            gradientAnimationDuration={4}
-            hoverEffect={false}
-            textClassName="text-left hero-headline-arial"
-            textStyle={HEADLINE_STYLE}
-            className={WRAP_CLS}
-          >
-            We Measure.
-          </AnimatedShinyText>
-        </div>
+        {/* Headline — solid warm near-black, line-mask reveal (GSAP in SiteScripts) */}
+        <h1 className="hero-headline" id="hero-headline">
+          <span className="line-mask">
+            <span className="line-mask-inner hero-headline-arial">They&nbsp;Promise,</span>
+          </span>
+          <span className="line-mask">
+            <span className="line-mask-inner hero-headline-arial">We&nbsp;Measure.</span>
+          </span>
+        </h1>
 
         <p className="hero-sub">
           The independent measurement layer for sustainability.
           Anchored to ESRS. Built for the sceptic.
         </p>
+
+        {/* Instrument row — ledger-like proof device; the single green tick is the one accent mark */}
+        <div className="hero-instrument" id="hero-instrument">
+          <span className="hero-instrument-rule" aria-hidden="true" />
+          <span className="hero-instrument-tick" aria-hidden="true" />
+          <span>ESRS-Aligned</span>
+          <span className="hero-instrument-sep" aria-hidden="true">·</span>
+          <span>A–E Verified Score</span>
+        </div>
+      </div>
+
+      {/* Object — right-anchored, oversized, ambient-animated backdrop */}
+      <div className="hero-image-wrap" id="hero-image-wrap">
+        <div className="hero-object-shadow" aria-hidden="true" />
+        <div className="hero-image-tilt" id="hero-image-tilt">
+          <Image
+            src="/hero-object.png"
+            alt="Validex — verified sustainability measurement instrument"
+            width={4693}
+            height={2640}
+            priority
+          />
+        </div>
       </div>
 
       {/* Scroll cue — bottom center */}
