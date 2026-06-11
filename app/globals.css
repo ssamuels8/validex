@@ -546,6 +546,114 @@ h1, h2, h3, h4, h5, h6 {
   opacity: 0; /* GSAP reveals with y 30→0 on scroll-in */
 }
 
+/* ── Data Supply Chain ──────────────────────────────────── */
+.chain-section {
+  background: var(--paper);
+  padding: clamp(14vh, 18vh, 20vh) 6vw;
+  border-top: 1px solid var(--line-light);
+}
+.chain-inner { max-width: 1180px; margin: 0 auto; }
+.chain-eyebrow {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--forest);
+  margin-bottom: 2rem;
+  font-family: var(--font-mono), 'DM Mono', monospace !important;
+}
+.chain-headline {
+  font-size: var(--h2);
+  font-weight: 500;
+  line-height: 0.98;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  margin-bottom: 1.5rem;
+  max-width: 22ch;
+  font-feature-settings: "ss01", "cv01";
+}
+.chain-sub {
+  font-size: var(--body);
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--on-light);
+  max-width: 52ch;
+  margin-bottom: 5rem;
+}
+/* The rail — five white cards, one hairline drawn through behind them */
+.chain-rail {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1.1rem;
+}
+.chain-line {
+  position: absolute;
+  top: 50%;
+  left: -2%;
+  width: 104%;
+  height: 2px;
+  overflow: visible;
+  pointer-events: none;
+}
+.chain-line path {
+  fill: none;
+  stroke: var(--line-light);
+  stroke-width: 1;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1; /* ScrollTrigger draws to 0 */
+}
+.chain-card {
+  position: relative;
+  z-index: 1;
+  background: var(--surface);
+  border: 1px solid var(--line-light);
+  border-radius: 12px;
+  padding: 1.5rem 1.4rem 1.6rem;
+  opacity: 0;                    /* GSAP staggers in */
+  transform: translateY(24px);
+}
+.chain-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.4rem;
+}
+.chain-card-idx {
+  font-family: var(--font-mono), 'DM Mono', monospace !important;
+  font-size: 0.66rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  color: var(--on-light);
+}
+/* One forest tick per card — the section's single accent mark */
+.chain-card-tick {
+  width: 6px;
+  height: 6px;
+  border-radius: 1px;
+  background: var(--forest);
+}
+.chain-card-title {
+  font-family: var(--font-mono), 'DM Mono', monospace !important;
+  font-size: 0.82rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink);
+  margin-bottom: 0.6rem;
+}
+.chain-card-line {
+  font-size: 0.85rem;
+  font-weight: 400;
+  line-height: 1.55;
+  color: var(--on-light);
+}
+@media (max-width: 900px) {
+  .chain-rail { grid-template-columns: 1fr; gap: 1rem; }
+  .chain-line { display: none; }
+}
+
 /* ── Case Studies — Card Grid ───────────────────────────── */
 .cs-grid-section {
   background: radial-gradient(ellipse at 50% 30%, var(--ink-soft) 0%, var(--ink) 60%);
@@ -935,7 +1043,17 @@ h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-mono), 'DM Mono', monospace;
 }
 .diagram-center-label { fill: var(--paper); font-size: 0.52rem; font-weight: 500; }
-.diagram-id-label { fill: var(--forest); font-size: 0.48rem; }
+.diagram-id-label { fill: var(--forest); font-size: 0.5rem; }
+.diagram-name-label { font-size: 0.56rem; fill: var(--ink); }
+.system-footnote {
+  margin-top: 3rem;
+  font-family: var(--font-mono), 'DM Mono', monospace !important;
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--on-light);
+}
 
 /* ── Score ──────────────────────────────────────────────── */
 .score {
@@ -1083,7 +1201,7 @@ h1, h2, h3, h4, h5, h6 {
 .sc-components { border-top: 1px solid var(--line-dark); padding-top: 1rem; }
 .sc-component-row {
   display: grid;
-  grid-template-columns: 110px 1fr 44px 26px;
+  grid-template-columns: 138px 1fr 44px 26px;  /* fits the taxonomy names */
   align-items: center;
   gap: 0.75rem;
   padding: 0.4rem 0;
@@ -1606,7 +1724,8 @@ h1, h2, h3, h4, h5, h6 {
 @media (max-width: 480px) {
   .sc-grades { grid-template-columns: 1fr; }
   .grade-letter { font-size: 5rem; }
-  .sc-component-row { grid-template-columns: 80px 1fr 36px 22px; gap: 0.4rem; }
+  .sc-component-row { grid-template-columns: 96px 1fr 36px 22px; gap: 0.4rem; }
+  .sc-comp-name { line-height: 1.35; }
   .scorecard-body { padding: 1rem; }
   .scorecard-head { padding: 0.75rem 1rem; }
   .scorecard-foot { flex-direction: column; gap: 0.3rem; align-items: flex-start; padding: 0.75rem 1rem; }

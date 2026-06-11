@@ -1,9 +1,9 @@
 const BARS = [
-  { name: 'EMISSIONS',     pct: 82, grade: 'A' },
-  { name: 'SUPPLY CHAIN',  pct: 74, grade: 'B' },
-  { name: 'LIFECYCLE',     pct: 68, grade: 'B' },
-  { name: 'CIRCULARITY',   pct: 71, grade: 'B' },
-  { name: 'CERTIFICATION', pct: 89, grade: 'A' },
+  { name: 'EMISSIONS & CLIMATE', pct: 82, grade: 'A' },
+  { name: 'SUPPLY CHAIN',        pct: 74, grade: 'B' },
+  { name: 'LIFECYCLE',           pct: 68, grade: 'B' },
+  { name: 'WASTE & CIRCULARITY', pct: 71, grade: 'B' },
+  { name: 'ENERGY USE',          pct: 89, grade: 'A' },
 ];
 
 export default function Score() {

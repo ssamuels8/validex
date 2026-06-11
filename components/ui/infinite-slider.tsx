@@ -54,8 +54,10 @@ export function InfiniteSlider({
           animationDirection: reverse ? 'reverse' : 'normal',
         }}
       >
-        <div style={{ display: 'flex', gap: `${gap}px`, flexShrink: 0 }}>{children}</div>
-        <div style={{ display: 'flex', gap: `${gap}px`, flexShrink: 0 }} aria-hidden="true">
+        {/* paddingRight = gap keeps the seam between the two copies as wide as the
+            internal item gap, so the loop never jams adjacent labels together. */}
+        <div style={{ display: 'flex', gap: `${gap}px`, paddingRight: `${gap}px`, flexShrink: 0 }}>{children}</div>
+        <div style={{ display: 'flex', gap: `${gap}px`, paddingRight: `${gap}px`, flexShrink: 0 }} aria-hidden="true">
           {children}
         </div>
       </div>

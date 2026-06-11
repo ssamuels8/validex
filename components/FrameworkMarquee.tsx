@@ -1,6 +1,8 @@
 import { InfiniteSlider } from '@/components/ui/infinite-slider';
 import { ProgressiveBlur } from '@/components/ui/progressive-blur';
 
+// One entry per standard, no doubles; the slider's seam padding keeps the
+// loop's last item ("SBTI") cleanly separated from the duplicate set's "ESRS".
 const FRAMEWORKS = [
   'ESRS',
   'CSRD',
@@ -11,7 +13,7 @@ const FRAMEWORKS = [
   'TCFD',
   'TNFD',
   'GHG PROTOCOL',
-  'SBTi',
+  'SBTI',
 ];
 
 export default function FrameworkMarquee() {

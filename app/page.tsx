@@ -5,6 +5,7 @@ import FrameworkMarquee from '@/components/FrameworkMarquee';
 import Manifesto        from '@/components/Manifesto';
 import WhoWeAre     from '@/components/WhoWeAre';
 import TheProblem   from '@/components/TheProblem';
+import SupplyChain  from '@/components/SupplyChain';
 import CaseStudies  from '@/components/CaseStudies';
 import System       from '@/components/System';
 import Score        from '@/components/Score';
@@ -22,6 +23,7 @@ export default function Page() {
       <Manifesto />
       <WhoWeAre />
       <TheProblem />
+      <SupplyChain />
       <CaseStudies />
       <System />
       <Score />

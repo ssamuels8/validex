@@ -153,6 +153,30 @@ export default function SiteScripts() {
         }
       }
 
+      // ── Supply chain rail: line draws through, cards rise in sequence ──
+      const chainRail = document.getElementById('chain-rail');
+      const chainLine = document.getElementById('chain-line-path');
+      const chainCards = document.querySelectorAll<HTMLElement>('.chain-card');
+      if (chainRail && !prefersReduced) {
+        ScrollTrigger.create({
+          trigger: chainRail,
+          start: 'top 80%',
+          once: true,
+          onEnter: () => {
+            if (chainLine) gsap.fromTo(chainLine,
+              { strokeDashoffset: 1 },
+              { strokeDashoffset: 0, duration: 1.2, ease: 'power2.inOut' }
+            );
+            if (chainCards.length) gsap.to(chainCards, {
+              opacity: 1, y: 0, duration: 0.6, ease: 'expo.out', stagger: 0.07, delay: 0.15,
+            });
+          },
+        });
+      } else {
+        if (chainLine) chainLine.style.strokeDashoffset = '0';
+        chainCards.forEach((c) => { c.style.opacity = '1'; c.style.transform = 'none'; });
+      }
+
       // ── Case study cards stagger reveal ────────────────────────
       if (!prefersReduced) {
         const cards = document.querySelectorAll<HTMLElement>('.cs-card');
