@@ -13,7 +13,7 @@ export default function ApplyPage() {
       <FloatingPaths />
 
       <header className="apply-nav">
-        <Link href="/" className="nav-logo">Validex.</Link>
+        <Link href="/" className="subpage-logo">Validex.</Link>
         <Link href="/" className="apply-back">← Back</Link>
       </header>
 

@@ -564,7 +564,7 @@ export default function SiteScripts() {
       }
 
       // ── Magnetic buttons (nav pill + apply submit) ──────────────
-      document.querySelectorAll<HTMLElement>('#nav-pill-cta, #apply-cta').forEach((btn) => {
+      document.querySelectorAll<HTMLElement>('#apply-cta').forEach((btn) => {
         btn.addEventListener('mousemove', (e) => {
           const r = btn.getBoundingClientRect();
           const dx = (e.clientX - (r.left + r.width / 2)) * 0.22;

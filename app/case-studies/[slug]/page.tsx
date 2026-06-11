@@ -525,8 +525,11 @@ export default async function CaseStudyPage({
 
   return (
     <main className="cs-page">
+      <header className="subpage-nav subpage-nav-dark">
+        <a href="/" className="subpage-logo">Validex.</a>
+        <a href="/#case-studies" className="cs-back subpage-back">← All cases</a>
+      </header>
       <div className="cs-page-inner">
-        <a href="/#case-studies" className="cs-back">← All cases</a>
 
         <span className="cs-category">{study.category}</span>
         <h1 className="cs-title">{study.title}</h1>

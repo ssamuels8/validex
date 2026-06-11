@@ -1,4 +1,3 @@
-import Nav              from '@/components/Nav';
 import Preloader        from '@/components/Preloader';
 import Hero             from '@/components/Hero';
 import FrameworkMarquee from '@/components/FrameworkMarquee';
@@ -17,7 +16,6 @@ export default function Page() {
   return (
     <>
       <Preloader />
-      <Nav />
       <Hero />
       <FrameworkMarquee />
       <Manifesto />

@@ -58,7 +58,7 @@ export default function Footer() {
       </div>
 
       <div className="footer-meta">
-        <span className="footer-copy">© <span className="footer-year">2026</span> Validex · The Hague · All rights reserved</span>
+        <span className="footer-copy">© 2026 Validex · The Hague · All rights reserved</span>
         <span className="footer-copy">ESRS · EU TAXONOMY ALIGNED</span>
       </div>
     </footer>

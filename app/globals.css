@@ -130,9 +130,11 @@ h1, h2, h3, h4, h5, h6 {
 
 /* ── Luxe dark surfaces — tonal gradients + light, never flat ── */
 .surface-forest {
+  /* Dark-first: near-black base, forest exists only as gradient light */
   background:
-    radial-gradient(120% 90% at 75% 10%, rgba(74, 138, 94, 0.16) 0%, transparent 55%),
-    linear-gradient(165deg, #143C28 0%, #0E2B1D 45%, #081A12 100%);
+    radial-gradient(110% 80% at 70% 8%, rgba(46, 94, 62, 0.28) 0%, transparent 50%),
+    radial-gradient(90% 70% at 15% 90%, rgba(46, 94, 62, 0.14) 0%, transparent 55%),
+    linear-gradient(168deg, #0E1A12 0%, #0A130D 50%, #070D09 100%);
   box-shadow: inset 0 0 160px rgba(0, 0, 0, 0.35);  /* soft vignette */
 }
 .surface-ink {
@@ -145,8 +147,9 @@ h1, h2, h3, h4, h5, h6 {
    as translucent overlays so the morph still breathes underneath. */
 body.field-mode .surface-forest {
   background:
-    radial-gradient(120% 90% at 75% 10%, rgba(74, 138, 94, 0.16) 0%, transparent 55%),
-    linear-gradient(165deg, rgba(20, 60, 40, 0.5) 0%, rgba(14, 43, 29, 0.66) 45%, rgba(8, 26, 18, 0.82) 100%);
+    radial-gradient(110% 80% at 70% 8%, rgba(46, 94, 62, 0.28) 0%, transparent 50%),
+    radial-gradient(90% 70% at 15% 90%, rgba(46, 94, 62, 0.14) 0%, transparent 55%),
+    linear-gradient(168deg, rgba(14, 26, 18, 0.55) 0%, rgba(10, 19, 13, 0.72) 50%, rgba(7, 13, 9, 0.88) 100%);
 }
 body.field-mode .surface-ink {
   background:
@@ -213,42 +216,6 @@ body.field-mode .apply-section {
   font-family: var(--font-mono), 'DM Mono', monospace !important;
 }
 
-/* ── Nav ────────────────────────────────────────────────── */
-.site-nav {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  z-index: 20;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1.5rem 2.5rem;
-  /* Fully transparent over the morphing body — difference blend keeps the
-     wordmark + pill legible on every colour field. No backdrop band. */
-  background: transparent;
-  mix-blend-mode: difference;
-}
-.nav-logo {
-  font-weight: 700;
-  font-size: 1.1rem;
-  color: var(--paper);   /* under difference: dark on cream, light on ink */
-  letter-spacing: -0.01em;
-}
-.nav-pill-cta {
-  font-family: var(--font-mono), 'DM Mono', monospace !important;
-  font-size: 0.72rem;
-  font-weight: 500;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  background: var(--paper); /* inverts per field under difference */
-  color: var(--ink);
-  border-radius: 999px;
-  padding: 0.65rem 1.4rem;
-  transition: opacity 0.25s;
-  will-change: transform;
-  white-space: nowrap;
-}
-.nav-pill-cta:hover { opacity: 0.82; }
-
 /* ── Hero — monumental cropped wordmark ─────────────────── */
 .hero {
   position: relative;
@@ -259,6 +226,22 @@ body.field-mode .apply-section {
   flex-direction: column;
   justify-content: center;
 }
+
+/* Corner link — the homepage's only chrome; scrolls away with the hero */
+.hero-corner-link {
+  position: absolute;
+  top: 1.6rem;
+  right: 2.5rem;
+  z-index: 4;
+  font-family: var(--font-mono), 'DM Mono', monospace !important;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink);
+  transition: color var(--dur-ui) var(--ease-ui);
+}
+.hero-corner-link:hover { color: var(--forest); }
 
 /* Warm radial glow */
 .hero-atmosphere {
@@ -524,16 +507,15 @@ body.field-mode .apply-section {
   pointer-events: none;
 }
 /* Arial required — !important beats the global * { font-family: ... !important } */
-/* The numeral voice — Instrument Serif, numbers only */
+/* The 85% speaks in the wordmark voice */
 .problem-stat,
 .problem-pct {
-  font-family: var(--font-numeral), 'Instrument Serif', Georgia, serif !important;
-  font-weight: 400;
-  font-size: clamp(8rem, 16vw, 16rem);
-  letter-spacing: -0.01em;
-  line-height: 0.85;
+  font-family: Arial, Helvetica, sans-serif !important;
+  font-weight: 700;
+  font-size: clamp(7rem, 15vw, 15rem);
+  letter-spacing: -0.04em;
+  line-height: 0.88;
   color: var(--paper);
-  text-shadow: 0 0 60px rgba(242, 238, 228, 0.12);
 }
 .problem-caption {
   font-size: 1rem;
@@ -644,10 +626,10 @@ body.field-mode .apply-section {
   margin-bottom: 1.4rem;
 }
 .chain-card-idx {
-  font-family: var(--font-numeral), 'Instrument Serif', Georgia, serif !important;
-  font-size: 1.15rem;
-  font-weight: 400;
-  letter-spacing: 0.02em;
+  font-family: var(--font-mono), 'DM Mono', monospace !important;
+  font-size: 0.66rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
   color: var(--on-light);
   transition: color var(--dur-ui) var(--ease-ui);
 }
@@ -918,11 +900,11 @@ body.field-mode .apply-section {
   justify-content: space-between;
 }
 .cs-card-index {
-  font-size: 1.05rem;
-  font-weight: 400;
-  letter-spacing: 0.04em;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
   color: var(--on-dark);
-  font-family: var(--font-numeral), 'Instrument Serif', Georgia, serif !important;
+  font-family: var(--font-mono), 'DM Mono', monospace !important;
 }
 .cs-card-category {
   font-size: 0.7rem;
@@ -1733,11 +1715,25 @@ body.field-mode .apply-section {
   border-top: 1px solid var(--line-dark);
   padding-top: 1.75rem;
 }
-.footer-year {
-  font-family: var(--font-numeral), 'Instrument Serif', Georgia, serif !important;
-  font-size: 0.85rem;
-  letter-spacing: 0.02em;
+
+/* ── Subpage minimal header ─────────────────────────────── */
+.subpage-nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem 2.5rem;
 }
+.subpage-logo {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+.subpage-back { margin-bottom: 0 !important; }
+.subpage-nav-dark .subpage-logo { color: var(--paper); }
 
 /* ── Legal pages ────────────────────────────────────────── */
 .legal-page {
@@ -1972,8 +1968,8 @@ body.field-mode .apply-section {
 
 /* ── Responsive ─────────────────────────────────────────── */
 @media (max-width: 900px) {
-  .site-nav { padding: 1.25rem 1.5rem; }
-  /* Mobile hero: the wordmark crops harder — that is the style */
+  .hero-corner-link { right: 1.75rem; top: 1.25rem; }
+  /* Mobile hero */
   .hero { min-height: 92svh; }
   .hero-wordmark { font-size: 26vw; }
   .hero-baseline-tags { padding: 0.7rem calc(4vw + 56px) 0 1.75rem; }

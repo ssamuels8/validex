@@ -30,6 +30,9 @@ export default function Hero() {
   return (
     <section className="hero" id="hero" data-field="#F4EFE6">
 
+      {/* Corner link — replaces the navbar; scrolls away with the hero */}
+      <a className="hero-corner-link" href="/apply">Apply For Pilot ↗</a>
+
       {/* Warm radial glow */}
       <div className="hero-atmosphere" aria-hidden="true" />
 
