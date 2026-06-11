@@ -338,27 +338,8 @@ export default function SiteScripts() {
         });
       }
 
-      // ── CTA headline line-mask ────────────────────────────────
-      const ctaLines = document.querySelectorAll<HTMLElement>('.cta-headline .line-mask-inner');
-      if (ctaLines.length && !prefersReduced) {
-        ScrollTrigger.create({
-          trigger: '.cta-headline',
-          start: 'top 80%',
-          onEnter: () => {
-            gsap.to(ctaLines, {
-              y: 0,
-              duration: 1.0,
-              ease: 'power4.out',
-              stagger: 0.12,
-            });
-          },
-        });
-      } else {
-        ctaLines.forEach((l) => { l.style.transform = 'none'; });
-      }
-
-      // ── Magnetic buttons (nav pill + CTA section) ───────────────
-      document.querySelectorAll<HTMLElement>('#nav-pill-cta, #cta-main-btn').forEach((btn) => {
+      // ── Magnetic buttons (nav pill + apply submit) ──────────────
+      document.querySelectorAll<HTMLElement>('#nav-pill-cta, #apply-submit').forEach((btn) => {
         btn.addEventListener('mousemove', (e) => {
           const r = btn.getBoundingClientRect();
           const dx = (e.clientX - (r.left + r.width / 2)) * 0.22;

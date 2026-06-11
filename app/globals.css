@@ -1170,65 +1170,159 @@ h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-mono), 'DM Mono', monospace !important;
 }
 
-/* ── CTA ────────────────────────────────────────────────── */
-.cta-section {
-  background: radial-gradient(ellipse at 50% 40%, #F6F2E9 0%, var(--paper) 65%);
-  min-height: 90vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 10vh 3rem;
-  border-top: 1px solid var(--line-light);
+/* ── Apply — scoring pilot application ──────────────────── */
+.apply-section {
+  background: radial-gradient(ellipse at 50% 35%, var(--ink-soft) 0%, var(--ink) 65%);
+  padding: clamp(14vh, 18vh, 20vh) 6vw;
+  border-top: 1px solid var(--line-dark);
 }
-.cta-inner { max-width: 900px; width: 100%; }
-.cta-eyebrow {
+.apply-inner {
+  max-width: 1180px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: clamp(3rem, 6vw, 6rem);
+  align-items: center;
+}
+.apply-eyebrow {
   display: block;
   font-size: 0.72rem;
   font-weight: 500;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--forest);
+  color: var(--moss-bright); /* forest is illegible on ink — lighter green on dark */
   margin-bottom: 2rem;
   font-family: var(--font-mono), 'DM Mono', monospace !important;
 }
-.cta-headline {
-  font-size: clamp(4rem, 10vw, 10rem);
-  font-weight: 500;
-  line-height: 0.92;
-  letter-spacing: -0.035em;
-  color: var(--ink);
-  margin-bottom: 2rem;
-  padding: 0 1rem;
-  /* overflow intentionally NOT hidden — line-mask children handle it */
-  font-feature-settings: "ss01", "cv01";
+/* Arial tight display voice, on dark */
+.apply-headline {
+  font-family: Arial, Helvetica, sans-serif !important;
+  font-size: clamp(2.8rem, 5.5vw, 5.5rem);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 0.9;
+  color: var(--paper);
+  margin-bottom: 1.5rem;
 }
-.cta-sub {
+.apply-sub {
   font-size: var(--body);
   font-weight: 400;
   line-height: 1.6;
-  color: var(--on-light);
-  margin-bottom: 3rem;
-  max-width: 44ch;
-  margin-left: auto;
-  margin-right: auto;
+  color: var(--on-dark);
+  max-width: 38ch;
 }
-.cta-btn {
-  display: inline-block;
-  background: var(--ink);
-  color: var(--paper);
-  border-radius: 999px;
-  padding: 1rem 2.2rem;
+
+/* The application card — dashboard-white surface on the dark band */
+.apply-card {
+  background: var(--surface);
+  border: 1px solid var(--line-light);
+  border-radius: 16px;
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.35);
+  padding: clamp(1.75rem, 3vw, 2.75rem);
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+}
+.apply-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+}
+.apply-field-row {
+  display: flex;
+  gap: 1.25rem;
+}
+.apply-label {
+  font-family: var(--font-mono), 'DM Mono', monospace !important;
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--on-light);
+}
+.apply-optional { opacity: 0.55; letter-spacing: 0.1em; }
+.apply-input {
+  font-family: var(--font-main), 'DM Sans', sans-serif !important;
+  font-size: 0.95rem;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line-light);
+  border-radius: 8px;
+  padding: 0.7rem 0.9rem;
+  width: 100%;
+  transition: border-color var(--dur-ui) var(--ease-ui);
+}
+.apply-input:hover { border-color: rgba(21, 19, 14, 0.28); }
+.apply-input:focus-visible {
+  outline: 2px solid var(--forest);
+  outline-offset: 1px;
+  border-color: var(--forest);
+}
+.apply-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%2315130E' stroke-width='1.2'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.9rem center;
+  cursor: pointer;
+}
+.apply-textarea { resize: vertical; min-height: 76px; }
+.apply-input-error { border-color: #9C3A2B; }
+.apply-error {
+  font-family: var(--font-mono), 'DM Mono', monospace !important;
+  font-size: 0.6rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #9C3A2B;
+}
+.apply-submit {
+  font-family: var(--font-mono), 'DM Mono', monospace !important;
   font-size: 0.7rem;
   font-weight: 500;
   letter-spacing: 0.14em;
   text-transform: uppercase;
+  background: var(--ink);
+  color: var(--paper);
+  border: none;
+  border-radius: 999px;
+  padding: 1rem 2rem;
+  width: 100%;
   cursor: pointer;
-  transition: background 0.25s;
+  transition: background var(--dur-ui) var(--ease-ui);
   will-change: transform;
-  font-family: var(--font-mono), 'DM Mono', monospace !important;
 }
-.cta-btn:hover { background: var(--moss); }
+.apply-submit:hover { background: var(--moss); }
+.apply-submit:focus-visible { outline: 2px solid var(--forest); outline-offset: 3px; }
+
+/* Success state — the grade-seal motif returns */
+.apply-success {
+  align-items: flex-start;
+  gap: 1.25rem;
+  animation: applySuccessIn var(--dur-mid) var(--ease-reveal) both;
+}
+.apply-seal { color: var(--forest); }
+.apply-success-title {
+  font-family: Arial, Helvetica, sans-serif !important;
+  font-size: 1.9rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+}
+.apply-success-sub {
+  font-size: 0.98rem;
+  line-height: 1.6;
+  color: var(--on-light);
+}
+@keyframes applySuccessIn {
+  from { opacity: 0; transform: translateY(var(--reveal-y)); }
+  to   { opacity: 1; transform: none; }
+}
+
+@media (max-width: 960px) {
+  .apply-inner { grid-template-columns: 1fr; }
+  .apply-field-row { flex-direction: column; gap: 1.4rem; }
+}
 
 /* ── Footer ─────────────────────────────────────────────── */
 .site-footer {

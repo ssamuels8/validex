@@ -8,7 +8,7 @@ import TheProblem   from '@/components/TheProblem';
 import CaseStudies  from '@/components/CaseStudies';
 import System       from '@/components/System';
 import Score        from '@/components/Score';
-import CtaSection   from '@/components/CtaSection';
+import ApplySection from '@/components/ApplySection';
 import Footer       from '@/components/Footer';
 import SiteScripts  from '@/components/SiteScripts';
 
@@ -25,7 +25,7 @@ export default function Page() {
       <CaseStudies />
       <System />
       <Score />
-      <CtaSection />
+      <ApplySection />
       <Footer />
       <SiteScripts />
     </>

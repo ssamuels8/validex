@@ -16,7 +16,7 @@ export default function Nav() {
     <nav className={`site-nav${scrolled ? ' scrolled' : ''}`} id="site-nav">
       <a href="/" className="nav-logo">Validex.</a>
       <a
-        href="#contact"
+        href="/#apply"
         className="nav-pill-cta"
         id="nav-pill-cta"
       >

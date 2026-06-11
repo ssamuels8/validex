@@ -562,7 +562,7 @@ export default async function CaseStudyPage({
         )}
 
         <div className="cs-cta">
-          <a href="#contact" className="cs-cta-link">
+          <a href="/#apply" className="cs-cta-link">
             Get In Touch ↗
           </a>
           <p className="cta-note">No forms. No demos. A conversation.</p>
