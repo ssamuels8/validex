@@ -369,43 +369,6 @@ export default function SiteScripts() {
         });
       });
 
-      // ── Hero scroll parallax: object drifts up + fades ──────
-      const imgWrap = document.getElementById('hero-image-wrap');
-      if (!prefersReduced) {
-        ScrollTrigger.create({
-          trigger: '#hero',
-          start: 'top top',
-          end: 'bottom top',
-          scrub: true,
-          onUpdate(self: { progress: number }) {
-            const p = self.progress;
-            if (imgWrap) gsap.set(imgWrap, { y: -120 * p, opacity: 1 - p * 0.7 });
-          },
-        });
-      }
-
-      // ── Hero mouse tilt (disabled on touch devices) ──────────
-      const heroSection = document.getElementById('hero');
-      const tiltEl = document.getElementById('hero-image-tilt');
-      const isTouchDevice = window.matchMedia('(pointer: coarse)').matches;
-      if (heroSection && tiltEl && !prefersReduced && !isTouchDevice) {
-        heroSection.addEventListener('mousemove', (e: Event) => {
-          const me = e as MouseEvent;
-          const r = heroSection.getBoundingClientRect();
-          const dx = (me.clientX - r.width / 2) / (r.width / 2);
-          const dy = (me.clientY - r.height / 2) / (r.height / 2);
-          gsap.to(tiltEl, {
-            rotateX: dy * -3,
-            rotateY: dx * 3,
-            duration: 0.5,
-            ease: 'power2.out',
-            transformPerspective: 900,
-          });
-        });
-        heroSection.addEventListener('mouseleave', () => {
-          gsap.to(tiltEl, { rotateX: 0, rotateY: 0, duration: 0.8, ease: 'power2.out' });
-        });
-      }
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -414,7 +377,6 @@ export default function SiteScripts() {
       // Vocabulary = motion tokens: expo.out (--ease-reveal), 0.9s big / 0.6s secondary, 70ms cascade.
       const eyebrow       = document.querySelector<HTMLElement>('.hero-eyebrow');
       const headlineLines = document.querySelectorAll<HTMLElement>('#hero-headline .line-mask-inner');
-      const imgWrap       = document.getElementById('hero-image-wrap');
       const heroSub       = document.querySelector<HTMLElement>('.hero-sub');
       const instrument    = document.getElementById('hero-instrument');
       const scrollCue     = document.getElementById('hero-scroll-cue');
@@ -422,7 +384,6 @@ export default function SiteScripts() {
       if (prefersReduced) {
         if (eyebrow) eyebrow.style.opacity = '1';
         headlineLines.forEach((l) => { l.style.transform = 'none'; });
-        if (imgWrap) gsap.set(imgWrap, { opacity: 1 });
         if (heroSub) heroSub.style.opacity = '1';
         if (instrument) instrument.style.opacity = '1';
         if (scrollCue) scrollCue.style.opacity = '1';
@@ -431,13 +392,6 @@ export default function SiteScripts() {
 
       const EASE = 'expo.out';                 // = cubic-bezier(0.16, 1, 0.3, 1)
       const tl = gsap.timeline();
-
-      // Object — quiet, slow rise underneath, begins immediately (the brand backdrop, not the lead)
-      if (imgWrap) tl.fromTo(imgWrap,
-        { y: 60, scale: 0.96, opacity: 0 },
-        { y: 0, scale: 1, opacity: 1, duration: 1.6, ease: 'power3.out', clearProps: 'scale' },
-        0
-      );
 
       // Eyebrow
       if (eyebrow) tl.fromTo(eyebrow,

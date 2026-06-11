@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import Image from 'next/image';
 import { ArrowDown } from 'lucide-react';
 
 export default function Hero() {
@@ -39,20 +38,6 @@ export default function Hero() {
           <span>ESRS-Aligned</span>
           <span className="hero-instrument-sep" aria-hidden="true">·</span>
           <span>A–E Verified Score</span>
-        </div>
-      </div>
-
-      {/* Object — right-anchored, oversized, ambient-animated backdrop */}
-      <div className="hero-image-wrap" id="hero-image-wrap">
-        <div className="hero-object-shadow" aria-hidden="true" />
-        <div className="hero-image-tilt" id="hero-image-tilt">
-          <Image
-            src="/hero-object.png"
-            alt="Validex — verified sustainability measurement instrument"
-            width={4693}
-            height={2640}
-            priority
-          />
         </div>
       </div>
 

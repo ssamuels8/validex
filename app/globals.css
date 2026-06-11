@@ -186,74 +186,15 @@ h1, h2, h3, h4, h5, h6 {
   background: var(--paper);
 }
 
-/* Warm radial glow — shifted right where object now lives */
+/* Warm radial glow — a soft light pool in the right-hand negative space,
+   giving the emptiness depth and intent rather than flat fill. */
 .hero-atmosphere {
   position: absolute;
   inset: 0;
   z-index: 0;
   background:
-    radial-gradient(ellipse 70% 60% at 80% 55%, rgba(247,243,234,0.9) 0%, transparent 65%),
-    radial-gradient(ellipse 45% 38% at 78% 70%, rgba(46,94,62,0.05) 0%, transparent 58%);
+    radial-gradient(ellipse 75% 65% at 78% 50%, rgba(247,243,234,0.9) 0%, transparent 66%);
   pointer-events: none;
-}
-
-/* Object — oversized backdrop, right-anchored, bleeds well off edges */
-.hero-image-wrap {
-  position: absolute;
-  right: -15%;
-  left: auto;
-  /* Vertical centering via calc: half of element height = width/(aspect 1.777)/2 */
-  top: calc(50% - clamp(394px, 35.17vw, 732px));
-  width: clamp(1400px, 125vw, 2600px);
-  z-index: 1;
-  pointer-events: none;
-  user-select: none;
-  opacity: 0; /* GSAP entrance */
-}
-.hero-object-shadow {
-  position: absolute;
-  bottom: 4%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 55%;
-  height: 80px;
-  background: radial-gradient(ellipse, rgba(21,19,14,0.10) 0%, transparent 72%);
-  filter: blur(44px);
-  pointer-events: none;
-  z-index: 0;
-}
-.hero-image-tilt {
-  width: 100%;
-  transform-style: preserve-3d;
-  perspective: 900px;
-  position: relative;
-  z-index: 1;
-}
-.hero-image-tilt img {
-  display: block;
-  width: 100%;
-  height: auto;
-  filter: drop-shadow(0 40px 90px rgba(21,19,14,0.12));
-  /* Three ambient layers: float + breathe + drift. animation-composition: add
-     composes each transform additively so they don't stomp each other. */
-  animation:
-    heroFloat  8s  ease-in-out infinite,
-    heroBreathe 14s ease-in-out infinite,
-    heroDrift  16s ease-in-out infinite;
-  animation-composition: add;
-  will-change: transform;
-}
-@keyframes heroFloat {
-  0%, 100% { transform: translateY(0); }
-  50%       { transform: translateY(-18px); }
-}
-@keyframes heroBreathe {
-  0%, 100% { transform: scale(1); }
-  50%       { transform: scale(1.02); }
-}
-@keyframes heroDrift {
-  0%, 100% { transform: rotate(-1.5deg); }
-  50%       { transform: rotate(1.5deg); }
 }
 
 /* Text — vertically centered, far-left edge, z2 */
@@ -295,7 +236,7 @@ h1, h2, h3, h4, h5, h6 {
    Min is 2.5rem so mobile (where 10.5vw < 4rem) gets a readable size. */
 .hero-headline-arial {
   font-family: Arial, Helvetica, sans-serif !important;
-  font-size: clamp(2.5rem, 10.5vw, 12rem);
+  font-size: clamp(2.5rem, 11.5vw, 14rem);
   font-weight: 700;
   letter-spacing: -0.05em;
   line-height: 0.82;
@@ -1371,25 +1312,13 @@ h1, h2, h3, h4, h5, h6 {
 /* ── Responsive ─────────────────────────────────────────── */
 @media (max-width: 900px) {
   .site-nav { padding: 1.25rem 1.5rem; }
-  /* Mobile hero: stack text top, object below */
-  .hero { min-height: 100svh; height: auto; overflow: hidden; }
+  /* Mobile hero: type only, kept vertically centred in the viewport */
+  .hero { min-height: 100svh; overflow: hidden; }
   .hero-text {
-    position: static;
-    top: auto;
-    transform: none;
     max-width: 100%;
-    padding: clamp(5rem, 14vh, 8rem) 1.75rem 2.5rem;
+    padding-left: 1.75rem;
+    padding-right: 1.75rem;
     align-items: flex-start;
-  }
-  .hero-image-wrap {
-    position: static;
-    left: auto;
-    right: auto;
-    top: auto;
-    width: 140vw;
-    margin: 0 auto;
-    transform: none;
-    opacity: 0; /* still hidden until GSAP reveals */
   }
   .hero-scroll-cue-wrap {
     position: fixed;
@@ -1464,7 +1393,6 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 @media (max-width: 480px) {
-  .hero-image-wrap { width: 100vw; }
   .sc-grades { grid-template-columns: 1fr; }
   .grade-letter { font-size: 5rem; }
   .sc-component-row { grid-template-columns: 80px 1fr 36px 22px; gap: 0.4rem; }
