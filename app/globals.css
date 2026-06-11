@@ -19,25 +19,28 @@ html, body, * {
 
 /* ── Tokens ─────────────────────────────────────────────── */
 :root {
-  /* Warm palette */
-  --paper:       #F2EEE4;
+  /* Warm palette — matched to the internal dashboard */
+  --paper:       #F4EFE6;  /* cream content field */
   --paper-deep:  #E7E1D3;
+  --surface:     #FFFFFF;  /* white card surface */
   --ink:         #15130E;
   --ink-soft:    #232019;
-  --moss:        #2E5E3E;
-  --moss-bright: #4A8A5E;
-  --moss-deep:   #1A4D33;  /* sampled from dashboard dark-green card */
+  --forest:      #1A4D33;  /* PRIMARY accent — dashboard signed-license green */
+  --moss:        #2E5E3E;  /* secondary green, hover states only */
+  --moss-bright: #4A8A5E;  /* accent on dark surfaces (legibility) */
+  --sage:        #DCE7DD;  /* pale green chip bg, sparingly */
   --on-dark:     rgba(242,238,228,0.62);
-  --on-light:    rgba(21,19,14,0.60);
+  --on-light:    rgba(21,19,14,0.62);
   --line-dark:   rgba(242,238,228,0.12);
-  --line-light:  rgba(21,19,14,0.10);
+  --line-light:  rgba(21,19,14,0.12);
 
   /* Backward-compat aliases */
-  --accent:  var(--moss);
-  --bone:    var(--paper);
-  --ink-60:  var(--on-light);
-  --ink-40:  rgba(21,19,14,0.40);
-  --line:    var(--line-light);
+  --accent:    var(--forest);
+  --moss-deep: var(--forest);
+  --bone:      var(--paper);
+  --ink-60:    var(--on-light);
+  --ink-40:    rgba(21,19,14,0.40);
+  --line:      var(--line-light);
 
   /* Type scale */
   --h1:   clamp(4rem, 11vw, 12rem);
@@ -48,9 +51,9 @@ html, body, * {
   /* Motion system — one shared vocabulary, reused everywhere */
   --ease-reveal: cubic-bezier(0.16, 1, 0.3, 1);  /* expo-out: big reveals */
   --ease-ui:     cubic-bezier(0.4, 0, 0.2, 1);   /* fast UI feedback */
-  --dur-slow: 0.9s;   /* big reveals */
-  --dur-base: 0.6s;   /* secondary */
-  --dur-fast: 0.2s;   /* UI */
+  --dur-big: 0.9s;   /* big reveals */
+  --dur-mid: 0.6s;   /* secondary */
+  --dur-ui:  0.2s;   /* UI feedback */
   --stagger:  0.07s;  /* between grouped items */
   --reveal-y: 24px;   /* default reveal distance */
 }
@@ -275,7 +278,7 @@ h1, h2, h3, h4, h5, h6 {
   width: 6px;
   height: 6px;
   border-radius: 1px;
-  background: var(--moss);
+  background: var(--forest);
   flex: none;
 }
 .hero-instrument-sep {
@@ -343,7 +346,7 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 500;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--moss);
+  color: var(--moss-bright);
   margin-bottom: 2rem;
   font-family: var(--font-mono), 'DM Mono', monospace !important;
 }
@@ -387,7 +390,7 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 500;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--moss);
+  color: var(--forest);
   margin-bottom: clamp(2.5rem, 4vh, 4rem);
 }
 .problem-grid {
@@ -423,7 +426,7 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 500;
   line-height: 1.25;
   color: var(--ink);
-  border-left: 2px solid var(--moss);
+  border-left: 2px solid var(--forest);
   padding-left: clamp(1.5rem, 2.5vw, 2.5rem);
   font-feature-settings: "ss01";
   opacity: 0; /* GSAP reveals with y 30→0 on scroll-in */
@@ -443,7 +446,7 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 500;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--moss);
+  color: var(--moss-bright);
   margin-bottom: 1.5rem;
   font-family: var(--font-mono), 'DM Mono', monospace !important;
 }
@@ -559,7 +562,7 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 500;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--moss);
+  color: var(--forest);
   margin-bottom: 1.25rem;
   font-family: var(--font-mono), 'DM Mono', monospace !important;
 }
@@ -759,7 +762,7 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 500;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--moss);
+  color: var(--forest);
   margin-bottom: 2rem;
   font-family: var(--font-mono), 'DM Mono', monospace !important;
 }
@@ -818,7 +821,7 @@ h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-mono), 'DM Mono', monospace;
 }
 .diagram-center-label { fill: var(--paper); font-size: 0.52rem; font-weight: 500; }
-.diagram-id-label { fill: var(--moss); font-size: 0.48rem; }
+.diagram-id-label { fill: var(--forest); font-size: 0.48rem; }
 
 /* ── Score ──────────────────────────────────────────────── */
 .score {
@@ -859,7 +862,7 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 500;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--moss);
+  color: var(--moss-bright);
   margin-bottom: 2rem;
   font-family: var(--font-mono), 'DM Mono', monospace !important;
 }
@@ -1071,7 +1074,7 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 500;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--moss);
+  color: var(--forest);
   margin-bottom: 2rem;
   font-family: var(--font-mono), 'DM Mono', monospace !important;
 }
