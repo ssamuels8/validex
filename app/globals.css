@@ -265,9 +265,9 @@ body.field-mode .apply-section {
   letter-spacing: -0.05em;
   line-height: 0.82;
   color: var(--ink);
-  font-size: 25.5vw;       /* VALIDEX✱ ≈ 4.15em wide → ~106vw: V and ✱ crop visibly */
-  width: 104vw;
-  margin-left: -3vw;        /* balances the crop: V loses more, ✱ stays readable */
+  font-size: 22vw;         /* VALIDEX✱ ≈ 4.15em → ~91vw: fits with ~3vw+ air each side */
+  width: 100%;
+  text-align: center;
   white-space: nowrap;
   display: block;
 }
@@ -314,7 +314,7 @@ body.field-mode .apply-section {
   justify-content: space-between;
   gap: 1rem;
   /* right padding clears the seal stamped at the end of the rule */
-  padding: 0.85rem calc(6vw + 84px) 0 2.5rem;
+  padding: 0.85rem calc(2.5rem + 68px) 0 2.5rem;
   opacity: 0; /* GSAP reveals */
 }
 .hero-tag {
@@ -328,10 +328,10 @@ body.field-mode .apply-section {
 /* The seal — half-overlapping the rule like a stamp on a document line */
 .hero-seal-line {
   position: absolute;
-  right: 6vw;
-  top: -28px;
-  width: 56px;
-  height: 56px;
+  right: 2.5rem;
+  top: -24px;
+  width: 48px;
+  height: 48px;
   color: var(--forest);
   mix-blend-mode: multiply;
   filter: drop-shadow(0 1px 4px rgba(21, 19, 14, 0.18));
@@ -438,29 +438,50 @@ body.field-mode .apply-section {
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--moss-bright);
-  margin-bottom: 2rem;
+  margin-bottom: 3rem;
   font-family: var(--font-mono), 'DM Mono', monospace !important;
-}
-.who-headline {
-  font-size: var(--h2);
-  font-weight: 500;
-  line-height: 0.98;
-  letter-spacing: -0.03em;
-  color: var(--paper);
-  margin-bottom: 4rem;
-  max-width: 18ch;
-  font-feature-settings: "ss01", "cv01";
 }
 .who-cols {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 4rem;
+  gap: clamp(2.5rem, 5vw, 5rem);
+  align-items: start;
 }
-.who-cols p {
-  font-size: var(--body);
+.who-headline-arial {
+  font-family: Arial, Helvetica, sans-serif !important;
+  font-size: clamp(3rem, 6vw, 5.5rem);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 0.92;
+  color: var(--paper);
+}
+.who-para {
+  font-size: 1.05rem;
   font-weight: 400;
   line-height: 1.6;
   color: var(--on-dark);
+  max-width: 44ch;
+}
+/* The anchor — one confident number in the wordmark voice */
+.who-stat {
+  display: block;
+  font-family: Arial, Helvetica, sans-serif !important;
+  font-size: clamp(4rem, 8vw, 7rem);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 0.9;
+  color: var(--paper);
+  margin-top: 2.5rem;
+}
+.who-stat-caption {
+  display: block;
+  font-family: var(--font-mono), 'DM Mono', monospace !important;
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--on-dark);
+  margin-top: 0.85rem;
 }
 
 /* ── Problem ────────────────────────────────────────────── */
@@ -1971,10 +1992,10 @@ body.field-mode .apply-section {
   .hero-corner-link { right: 1.75rem; top: 1.25rem; }
   /* Mobile hero */
   .hero { min-height: 92svh; }
-  .hero-wordmark { font-size: 26vw; }
-  .hero-baseline-tags { padding: 0.7rem calc(4vw + 56px) 0 1.75rem; }
+  .hero-wordmark { font-size: 21vw; }
+  .hero-baseline-tags { padding: 0.7rem calc(1.75rem + 52px) 0 1.75rem; }
   .hero-tag { font-size: 0.54rem; }
-  .hero-seal-line { width: 44px; height: 44px; top: -22px; right: 4vw; }
+  .hero-seal-line { width: 40px; height: 40px; top: -20px; right: 1.75rem; }
   .hero-intro { left: 1.75rem; bottom: 8.5rem; }
   .hero-scroll-cue-wrap { bottom: 2.25rem; right: 1.75rem; }
   .who-cols { grid-template-columns: 1fr; gap: 2rem; }
