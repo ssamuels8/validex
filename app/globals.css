@@ -110,13 +110,13 @@ h1, h2, h3, h4, h5, h6 {
   }
   .reveal { opacity: 1 !important; transform: none !important; }
   /* Hero: complete final state, statically */
-  .hero-gridline { transform: none !important; }
   .line-mask-inner { transform: none !important; }
-  .hero-dim-path { stroke-dashoffset: 0 !important; }
-  .hero-reg-tick,
-  .hero-eyebrow, .hero-sub, .hero-instrument,
+  .hero-baseline-rule { transform: none !important; }
+  .hw-inner { transform: none !important; }
+  #hw-ast-svg { transform: none !important; }
+  .hero-baseline-tags, .hero-intro,
   .hero-scroll-cue-wrap { opacity: 1 !important; }
-  .hero-seal { opacity: 1 !important; transform: none !important; }
+  .hero-seal-line { opacity: 1 !important; transform: none !important; }
   /* Sitewide: every JS-revealed element renders its final state */
   .manifesto-word, .problem-pull, .score-fade-up,
   .chain-card, .sc-reveal { opacity: 1 !important; transform: none !important; }
@@ -249,369 +249,160 @@ body.field-mode .apply-section {
 }
 .nav-pill-cta:hover { opacity: 0.82; }
 
-/* ── Hero ───────────────────────────────────────────────── */
+/* ── Hero — monumental cropped wordmark ─────────────────── */
 .hero {
   position: relative;
-  min-height: 100svh;
-  overflow: hidden;
+  min-height: 92svh;       /* next section peeks below the fold — invites scroll */
+  overflow: hidden;        /* crops the wordmark; body never scrolls sideways */
   background: var(--paper);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
-/* Warm radial glow — a soft light pool in the right-hand negative space,
-   giving the emptiness depth and intent rather than flat fill. */
+/* Warm radial glow */
 .hero-atmosphere {
   position: absolute;
   inset: 0;
   z-index: 0;
   background:
-    radial-gradient(ellipse 75% 65% at 78% 50%, rgba(247,243,234,0.9) 0%, transparent 66%);
+    radial-gradient(ellipse 75% 65% at 78% 50%, rgba(247, 243, 234, 0.9) 0%, transparent 66%);
   pointer-events: none;
 }
 
-/* Baseline grid — engineering-paper rules, drawn in on load (z0, behind text) */
-.hero-grid {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
+/* THE WORDMARK — one line, bleeding off both edges */
+.hero-wordmark-zone {
+  position: relative;
+  z-index: 1;
+  margin-top: 3vh;
 }
-.hero-gridline {
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: var(--line-light);
-  transform: scaleX(0);          /* GSAP draws in, origin left */
-  transform-origin: left center;
-}
-.hero-gridline:nth-child(1) { top: 22%; }
-.hero-gridline:nth-child(2) { top: 41%; }
-.hero-gridline:nth-child(3) { top: 60%; }
-.hero-gridline:nth-child(4) { top: 79%; }
-
-/* Text — vertically centered, far-left edge, z2 */
-.hero-text {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  left: 0;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  text-align: left;
-  padding-left: clamp(1rem, 2vw, 2.5rem);
-  padding-right: 2rem;
-  max-width: 85vw;
-}
-/* Eyebrow — mono (via global [class*="-eyebrow"]), forest-green, the earned accent */
-.hero-eyebrow {
-  display: inline-block;
-  color: var(--moss-deep);
-  font-size: 0.72rem;
-  font-weight: 500;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  margin-bottom: 2.25rem;
-  opacity: 0; /* GSAP reveals */
-}
-/* Headline — one bold element: solid warm near-black, Arial tight, line-mask reveal */
-.hero-headline {
-  margin-bottom: 3.5rem;  /* room for the dimension annotation beneath the type */
-  text-rendering: optimizeLegibility;
-}
-.hero-headline .line-mask {
-  /* a touch of bottom room so the mask never clips Arial descenders at lh 0.82 */
-  padding-bottom: 0.12em;
-}
-/* Arial override — needs !important to beat the global * { font-family: ... !important } rule.
-   Min is 2.5rem so mobile (where 10.5vw < 4rem) gets a readable size. */
-.hero-headline-arial {
+.hero-wordmark {
   font-family: Arial, Helvetica, sans-serif !important;
-  font-size: clamp(2.5rem, 11.5vw, 14rem);
   font-weight: 700;
   letter-spacing: -0.05em;
   line-height: 0.82;
   color: var(--ink);
-}
-.hero-sub {
-  font-size: 1rem;
-  font-weight: 400;
-  line-height: 1.6;
-  color: var(--on-light);
-  max-width: 34ch;
-  opacity: 0;
-}
-
-/* Headline + annotations share one anchor box */
-.hero-headline-wrap {
-  position: relative;
-}
-
-/* Annotation layer — surveyor marks anchored to the live type via JS.
-   Hidden until positioned; gets a ±4px mouse drift when idle. */
-.hero-annotation {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 3;
-  opacity: 0; /* JS positions, then reveals */
-}
-.hero-dim-svg {
-  position: absolute;
-  overflow: visible;
-}
-.hero-dim-path {
-  fill: none;
-  stroke: var(--on-light);
-  stroke-width: 0.8;
-  stroke-dasharray: 1;     /* with pathLength=1: dashoffset 1→0 draws the path */
-  stroke-dashoffset: 1;
-}
-.hero-dim-forest {
-  stroke: var(--forest);
-  stroke-width: 1.1;
-}
-.hero-dim-label {
-  position: absolute;
-  font-family: var(--font-mono), 'DM Mono', ui-monospace, monospace !important;
-  font-size: 0.62rem;
-  font-weight: 500;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--on-light);
+  font-size: 25.5vw;       /* VALIDEX✱ ≈ 4.15em wide → ~106vw: V and ✱ crop visibly */
+  width: 104vw;
+  margin-left: -3vw;        /* balances the crop: V loses more, ✱ stays readable */
   white-space: nowrap;
-  min-height: 1em;
+  display: block;
 }
-/* Registration tick — a small surveyor cross */
-.hero-reg-tick {
-  position: absolute;
-  width: 11px;
-  height: 11px;
+/* Per-letter baseline masks for the rise */
+.hw-letter {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+}
+.hw-inner {
+  display: inline-block;
+  transform: translateY(110%);   /* rises to 0 on load */
+}
+/* Two-tone: "EX" is stroke-only */
+.hw-stroke {
+  color: transparent;
+  -webkit-text-stroke: 2px var(--ink);
+}
+/* The green asterisk-seal — the only colour in the mark */
+.hw-ast svg {
+  width: 0.35em;
+  height: 0.35em;
+  color: var(--forest);
+  display: inline-block;
+  margin-left: 0.05em;
+  will-change: transform;
+}
+
+/* Baseline rule — full bleed, with mono tags and the seal stamped on the line */
+.hero-baseline {
+  position: relative;
+  margin-top: 1.6vw;
+}
+.hero-baseline-rule {
+  display: block;
+  width: 100%;
+  height: 1px;
+  background: var(--line-light);
+  transform: scaleX(0);          /* draws in on load */
+  transform-origin: left center;
+}
+.hero-baseline-tags {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  /* right padding clears the seal stamped at the end of the rule */
+  padding: 0.85rem calc(6vw + 84px) 0 2.5rem;
   opacity: 0; /* GSAP reveals */
 }
-.hero-reg-tick::before,
-.hero-reg-tick::after {
-  content: '';
-  position: absolute;
-  background: var(--on-light);
+.hero-tag {
+  font-family: var(--font-mono), 'DM Mono', monospace !important;
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--on-light);
 }
-.hero-reg-tick::before { left: 0; right: 0; top: 5px; height: 1px; }
-.hero-reg-tick::after  { top: 0; bottom: 0; left: 5px; width: 1px; }
-
-/* Grade seal — ink-stamp, multiply blend so the paper shows through */
-.hero-seal {
+/* The seal — half-overlapping the rule like a stamp on a document line */
+.hero-seal-line {
   position: absolute;
-  width: 64px;
-  height: 64px;
+  right: 6vw;
+  top: -28px;
+  width: 56px;
+  height: 56px;
   color: var(--forest);
-  z-index: 4;
-  opacity: 0;
-  transform: scale(1.4) rotate(2deg);
   mix-blend-mode: multiply;
   filter: drop-shadow(0 1px 4px rgba(21, 19, 14, 0.18));
+  opacity: 0;
+  transform: scale(1.4) rotate(2deg);
   will-change: transform, opacity;
+  z-index: 2;
 }
 .hero-seal-text {
   font-family: var(--font-mono), 'DM Mono', ui-monospace, monospace !important;
   font-size: 6.1px;
   font-weight: 500;
   letter-spacing: 0.14em;
-  fill: var(--forest);
+  fill: currentColor;
 }
 .hero-seal-grade {
   font-family: Arial, Helvetica, sans-serif !important;
   font-weight: 700;
   font-size: 22px;
-  fill: var(--forest);
+  fill: currentColor;
   text-anchor: middle;
   dominant-baseline: central;
   letter-spacing: -0.02em;
 }
-@media (max-width: 640px) {
-  .hero-seal { width: 44px; height: 44px; }
-}
 
-/* Drift wrapper inside the annotation layer (mouse drift lives here;
-   the outer layer takes the scroll shear) */
-.hero-annotation-drift {
+/* Intro block — bottom left, Marin-style */
+.hero-intro {
   position: absolute;
-  inset: 0;
-}
-
-/* ── Hero: live crosshair (CAD canvas) ──────────────────── */
-.hero-crosshair {
-  position: absolute;
-  inset: 0;
-  z-index: 5;
-  pointer-events: none;
-  opacity: 0; /* JS shows while the cursor is inside the hero */
-}
-.hero-xh-v {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  width: 1px;
-  background: rgba(21, 19, 14, 0.2);
-  will-change: transform;
-}
-.hero-xh-h {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  height: 1px;
-  background: rgba(21, 19, 14, 0.2);
-  will-change: transform;
-}
-.hero-xh-readout {
-  position: absolute;
-  top: 0;
-  left: 0;
-  font-family: var(--font-mono), 'DM Mono', monospace !important;
-  font-size: 0.6rem;
-  font-weight: 500;
-  letter-spacing: 0.12em;
-  color: var(--on-light);
-  white-space: nowrap;
-  will-change: transform;
-}
-
-/* ── Hero: word measurement on hover ────────────────────── */
-.hero-headline .line-mask-inner { white-space: nowrap; }
-.hl-word {
-  position: relative;
-  display: inline-block;
-}
-@media (hover: hover) and (pointer: fine) {
-  /* Tag above the word — doubles as the top dimension bracket */
-  .hl-word::before {
-    content: attr(data-tag);
-    position: absolute;
-    top: -1.1em;
-    left: 0.02em;
-    right: 0.02em;
-    font-family: var(--font-mono), 'DM Mono', monospace;
-    font-size: clamp(9px, 0.09em, 14px);
-    font-weight: 500;
-    letter-spacing: 0.18em;
-    line-height: 2.2;
-    color: var(--on-light);
-    border-bottom: 1px solid rgba(21, 19, 14, 0.35);
-    opacity: 0;
-    transition: opacity 150ms var(--ease-ui);
-    pointer-events: none;
-  }
-  /* Bottom bracket */
-  .hl-word::after {
-    content: '';
-    position: absolute;
-    left: 0.02em;
-    right: 0.02em;
-    bottom: -0.05em;
-    height: 0.08em;
-    border-bottom: 1px solid rgba(21, 19, 14, 0.35);
-    border-left: 1px solid rgba(21, 19, 14, 0.35);
-    border-right: 1px solid rgba(21, 19, 14, 0.35);
-    opacity: 0;
-    transition: opacity 150ms var(--ease-ui);
-    pointer-events: none;
-  }
-  .hl-word:hover::before,
-  .hl-word:hover::after { opacity: 1; }
-  .hl-word-verified::before {
-    color: var(--forest);
-    border-bottom-color: var(--forest);
-  }
-  .hl-word-verified::after {
-    border-color: var(--forest);
-  }
-}
-
-/* ── Hero: click-to-stamp layer ─────────────────────────── */
-.hero-stamps {
-  position: absolute;
-  inset: 0;
-  z-index: 4;
-  pointer-events: none;
-}
-.hero-stamp {
-  position: absolute;
-  width: 44px;
-  height: 44px;
-  color: var(--forest);
-  mix-blend-mode: multiply;
-  filter: drop-shadow(0 1px 3px rgba(21, 19, 14, 0.16));
-  will-change: transform, opacity;
-}
-.hero-stamp svg { width: 100%; height: 100%; display: block; }
-.hero-stamp-check {
-  font-family: Arial, Helvetica, sans-serif !important;
-  font-size: 14px;
-  font-weight: 700;
-  fill: currentColor;
-  text-anchor: middle;
-  dominant-baseline: central;
-}
-.hero-stamp-word {
-  font-family: var(--font-mono), 'DM Mono', monospace !important;
-  font-size: 4.6px;
-  font-weight: 500;
-  letter-spacing: 0.12em;
-  fill: currentColor;
-  text-anchor: middle;
-}
-
-/* Scroll cue — arrow spins 360° once on hover */
-.hero-scroll-cue:hover svg {
-  animation: cueSpin 0.6s var(--ease-ui);
-}
-@keyframes cueSpin {
-  to { transform: rotate(360deg); }
-}
-/* Instrument row — ledger-like proof device. One green tick = the single accent mark. */
-.hero-instrument {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 0.55rem 0.8rem;
-  margin-top: 2.5rem;
+  left: 2.5rem;
+  bottom: 4.5rem;
+  z-index: 2;
+  max-width: 34ch;
   opacity: 0; /* GSAP reveals */
-  font-family: var(--font-mono), 'DM Mono', ui-monospace, monospace !important;
-  font-size: 0.66rem;
-  font-weight: 500;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
+}
+.hero-intro-lead {
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--ink);
+  margin-bottom: 0.5rem;
+}
+.hero-intro-body {
+  font-size: 0.95rem;
+  line-height: 1.6;
   color: var(--on-light);
 }
-.hero-instrument-rule {
-  height: 1px;
-  width: clamp(28px, 4vw, 56px);
-  background: var(--line-light);
-  flex: none;
-}
-.hero-instrument-tick {
-  width: 6px;
-  height: 6px;
-  border-radius: 1px;
-  background: var(--forest);
-  flex: none;
-}
-.hero-instrument-sep {
-  opacity: 0.45;
-}
 
-/* Scroll cue — bottom center */
+/* Scroll cue — bottom right */
 .hero-scroll-cue-wrap {
   position: absolute;
-  bottom: 3.5vh;
-  left: 50%;
-  transform: translateX(-50%);
+  bottom: 4.5rem;
+  right: 2.5rem;
   z-index: 3;
   opacity: 0; /* GSAP reveals */
 }
-/* Still when idle — the only idle motion in the hero is the label re-type + drift */
 .hero-scroll-cue {
   width: 46px;
   height: 46px;
@@ -622,6 +413,12 @@ body.field-mode .apply-section {
   justify-content: center;
   color: var(--ink);
   cursor: pointer;
+}
+.hero-scroll-cue:hover svg {
+  animation: cueSpin 0.6s var(--ease-ui);
+}
+@keyframes cueSpin {
+  to { transform: rotate(360deg); }
 }
 
 /* ── Manifesto ──────────────────────────────────────────── */
@@ -2176,18 +1973,14 @@ body.field-mode .apply-section {
 /* ── Responsive ─────────────────────────────────────────── */
 @media (max-width: 900px) {
   .site-nav { padding: 1.25rem 1.5rem; }
-  /* Mobile hero: type only, kept vertically centred in the viewport */
-  .hero { min-height: 100svh; overflow: hidden; }
-  .hero-text {
-    max-width: 100%;
-    padding-left: 1.75rem;
-    padding-right: 1.75rem;
-    align-items: flex-start;
-  }
-  .hero-scroll-cue-wrap {
-    position: fixed;
-    bottom: 3vh;
-  }
+  /* Mobile hero: the wordmark crops harder — that is the style */
+  .hero { min-height: 92svh; }
+  .hero-wordmark { font-size: 26vw; }
+  .hero-baseline-tags { padding: 0.7rem calc(4vw + 56px) 0 1.75rem; }
+  .hero-tag { font-size: 0.54rem; }
+  .hero-seal-line { width: 44px; height: 44px; top: -22px; right: 4vw; }
+  .hero-intro { left: 1.75rem; bottom: 8.5rem; }
+  .hero-scroll-cue-wrap { bottom: 2.25rem; right: 1.75rem; }
   .who-cols { grid-template-columns: 1fr; gap: 2rem; }
   .manifesto { padding: 12vh 2rem; }
   .who-section { padding: 14vh 2rem; }

@@ -563,118 +563,6 @@ export default function SiteScripts() {
         wmFill.style.opacity = '1';
       }
 
-      // ── Hero playable layer: shear, crosshair, click-to-stamp ──
-      const heroEl = document.getElementById('hero');
-      const finePtr = window.matchMedia('(pointer: fine)').matches;
-      if (heroEl && !prefersReduced) {
-        // Scroll-out kinetics — lines and annotations leave at different speeds
-        const heroMasks = document.querySelectorAll<HTMLElement>('.hero-headline .line-mask');
-        const annoLayer = document.getElementById('hero-annotation');
-        const sealEl = document.getElementById('hero-seal');
-        ScrollTrigger.create({
-          trigger: '#hero',
-          start: 'top top',
-          end: 'bottom top',
-          scrub: true,
-          onUpdate(self: { progress: number }) {
-            const p = self.progress;
-            const K = 120;
-            if (heroMasks[0]) gsap.set(heroMasks[0], { y: -K * p });
-            if (heroMasks[1]) gsap.set(heroMasks[1], { y: -K * 1.15 * p });
-            if (annoLayer) gsap.set(annoLayer, { y: -K * 0.85 * p });
-            if (sealEl) gsap.set(sealEl, { y: -K * 0.85 * p });
-          },
-        });
-
-        // Live crosshair — CAD canvas, lerped (desktop only)
-        if (finePtr) {
-          const xh = document.getElementById('hero-crosshair');
-          const xhV = document.getElementById('hero-xh-v');
-          const xhH = document.getElementById('hero-xh-h');
-          const xhR = document.getElementById('hero-xh-readout');
-          const headlineEl = document.getElementById('hero-headline');
-          let txc = 0, tyc = 0, cxc = 0, cyc = 0, measuring = false;
-          const onXhMove = (e: MouseEvent) => {
-            const r = heroEl.getBoundingClientRect();
-            txc = e.clientX - r.left;
-            tyc = e.clientY - r.top;
-          };
-          const onXhEnter = () => { if (xh) gsap.to(xh, { opacity: 1, duration: 0.2 }); };
-          const onXhLeave = () => { if (xh) gsap.to(xh, { opacity: 0, duration: 0.2 }); };
-          heroEl.addEventListener('mousemove', onXhMove);
-          heroEl.addEventListener('mouseenter', onXhEnter);
-          heroEl.addEventListener('mouseleave', onXhLeave);
-          if (headlineEl) {
-            headlineEl.addEventListener('mouseenter', () => { measuring = true; });
-            headlineEl.addEventListener('mouseleave', () => { measuring = false; });
-          }
-          const pad4 = (n: number) => String(Math.max(0, Math.round(n))).padStart(4, '0');
-          const xhTick = () => {
-            cxc += (txc - cxc) * 0.12;
-            cyc += (tyc - cyc) * 0.12;
-            if (xhV) gsap.set(xhV, { x: cxc });
-            if (xhH) gsap.set(xhH, { y: cyc });
-            if (xhR) {
-              gsap.set(xhR, { x: cxc + 14, y: cyc + 14 });
-              xhR.textContent = measuring
-                ? 'MEASURING…'
-                : `X ${pad4(cxc)} · Y ${pad4(cyc)} · UNVERIFIED`;
-            }
-          };
-          gsap.ticker.add(xhTick);
-          cleanups.push(() => {
-            gsap.ticker.remove(xhTick);
-            heroEl.removeEventListener('mousemove', onXhMove);
-            heroEl.removeEventListener('mouseenter', onXhEnter);
-            heroEl.removeEventListener('mouseleave', onXhLeave);
-          });
-        }
-
-        // Click-to-stamp — max 5 on screen, oldest fades after 4s
-        const stampsLayer = document.getElementById('hero-stamps');
-        const liveStamps: HTMLElement[] = [];
-        const STAMP_SVG =
-          '<svg viewBox="0 0 44 44">' +
-          '<circle cx="22" cy="22" r="21" fill="none" stroke="currentColor" stroke-width="1.1"/>' +
-          '<circle cx="22" cy="22" r="17.5" fill="none" stroke="currentColor" stroke-width="0.5"/>' +
-          '<text x="22" y="19" class="hero-stamp-check">✓</text>' +
-          '<text x="22" y="31" class="hero-stamp-word">MEASURED</text>' +
-          '</svg>';
-        const spawnStamp = (x: number, y: number) => {
-          if (!stampsLayer) return;
-          const el = document.createElement('div');
-          el.className = 'hero-stamp';
-          el.innerHTML = STAMP_SVG;
-          el.style.left = `${x - 22}px`;
-          el.style.top = `${y - 22}px`;
-          stampsLayer.appendChild(el);
-          gsap.fromTo(el,
-            { scale: 1.3, rotation: 2, opacity: 0 },
-            { scale: 1, rotation: 0, opacity: 1, duration: 0.35, ease: 'expo.out' }
-          );
-          liveStamps.push(el);
-          if (liveStamps.length > 5) {
-            const oldest = liveStamps.shift();
-            if (oldest) gsap.to(oldest, { opacity: 0, duration: 0.3, onComplete: () => oldest.remove() });
-          }
-          const tm = window.setTimeout(() => {
-            const k = liveStamps.indexOf(el);
-            if (k >= 0) liveStamps.splice(k, 1);
-            gsap.to(el, { opacity: 0, duration: 0.5, onComplete: () => el.remove() });
-          }, 4000);
-          timers.push(tm);
-        };
-        const onHeroClick = (e: MouseEvent) => {
-          const t = e.target as HTMLElement;
-          if (t.closest('a,button')) return;             // never intercept real controls
-          if (!finePtr && !t.closest('#hero-headline')) return; // touch: tap the headline
-          const r = heroEl.getBoundingClientRect();
-          spawnStamp(e.clientX - r.left, e.clientY - r.top);
-        };
-        heroEl.addEventListener('click', onHeroClick);
-        cleanups.push(() => heroEl.removeEventListener('click', onHeroClick));
-      }
-
       // ── Magnetic buttons (nav pill + apply submit) ──────────────
       document.querySelectorAll<HTMLElement>('#nav-pill-cta, #apply-cta').forEach((btn) => {
         btn.addEventListener('mousemove', (e) => {
@@ -690,203 +578,106 @@ export default function SiteScripts() {
 
     }
 
-    // ── Hero: anchor the measurement annotations to the live type ──
-    // Positions the dimension SVG, label, registration ticks, and seal
-    // against the bounding boxes of the two headline lines. Re-run on resize.
-    function measureHeroAnnotations() {
-      const wrap   = document.getElementById('hero-headline-wrap');
-      const l1     = document.getElementById('hl-line-1');
-      const l2     = document.getElementById('hl-line-2');
-      const svg    = document.getElementById('hero-dim-svg');
-      const label  = document.getElementById('hero-dim-label');
-      const tick1  = document.getElementById('reg-tick-1');
-      const tick2  = document.getElementById('reg-tick-2');
-      const seal   = document.getElementById('hero-seal');
-      if (!wrap || !l1 || !l2 || !svg || !label || !seal) return;
-
-      const wrapR = wrap.getBoundingClientRect();
-      const r1 = l1.getBoundingClientRect();
-      const r2 = l2.getBoundingClientRect();
-      // Use untransformed boxes: during the masked rise the lines are translated
-      // down, which would skew anchors — measure from the mask (parent) instead.
-      const m1 = (l1.parentElement as HTMLElement).getBoundingClientRect();
-      const m2 = (l2.parentElement as HTMLElement).getBoundingClientRect();
-      const w2 = r2.width; // glyph width is unaffected by translateY
-
-      // Dimension line under "We Measure." — full width of the line
-      const W = Math.max(80, Math.round(w2));
-      const dimTop = m2.bottom - wrapR.top + 6;
-      svg.setAttribute('width', String(W));
-      svg.style.left = `${m2.left - wrapR.left}px`;
-      svg.style.top = `${dimTop}px`;
-      const set = (id: string, d: string) => document.getElementById(id)?.setAttribute('d', d);
-      set('dim-line',    `M 10 18 H ${W - 10}`);
-      set('dim-tick-l',  'M 1 8 V 28');
-      set('dim-tick-r',  `M ${W - 1} 8 V 28`);
-      set('dim-arrow-l', 'M 18 12 L 10 18 L 18 24');
-      set('dim-arrow-r', `M ${W - 18} 12 L ${W - 10} 18 L ${W - 18} 24`);
-
-      // Label — beside the line if there is room, otherwise below it
-      const labelW = 170;
-      const roomRight = window.innerWidth - (m2.left + W) > labelW + 40;
-      if (roomRight) {
-        label.style.left = `${m2.left - wrapR.left + W + 16}px`;
-        label.style.top = `${dimTop + 12}px`;
-      } else {
-        label.style.left = `${m2.left - wrapR.left + 10}px`;
-        label.style.top = `${dimTop + 30}px`;
-      }
-
-      // Registration ticks — cap-height of line 1, baseline of line 2
-      if (tick1) {
-        tick1.style.left = `${m1.left - wrapR.left + r1.width + 14}px`;
-        tick1.style.top = `${m1.top - wrapR.top + 2}px`;
-      }
-      if (tick2) {
-        tick2.style.left = `${m2.left - wrapR.left - 20}px`;
-        tick2.style.top = `${m2.bottom - wrapR.top - 14}px`;
-      }
-
-      // Seal — next to the final period, baseline-aligned
-      const sealSize = window.innerWidth <= 640 ? 44 : 64;
-      seal.style.left = `${m2.left - wrapR.left + w2 + 16}px`;
-      seal.style.top = `${m2.bottom - wrapR.top - sealSize - 2}px`;
-    }
-
-    // Typed label — "CLAIM — UNVERIFIED" flips to "MEASURED · 2026"
-    const TYPE_A = 'CLAIM — UNVERIFIED';
-    const TYPE_B = 'MEASURED · 2026';
-    const timers: number[] = [];
-    function typeText(el: HTMLElement, text: string, msPerChar: number, done?: () => void) {
-      let i = 0;
-      el.textContent = '';
-      const t = window.setInterval(() => {
-        i += 1;
-        el.textContent = text.slice(0, i);
-        if (i >= text.length) { window.clearInterval(t); done?.(); }
-      }, msPerChar);
-      timers.push(t);
-    }
-    function eraseText(el: HTMLElement, msPerChar: number, done?: () => void) {
-      const t = window.setInterval(() => {
-        const cur = el.textContent ?? '';
-        el.textContent = cur.slice(0, -1);
-        if (!el.textContent) { window.clearInterval(t); done?.(); }
-      }, msPerChar);
-      timers.push(t);
-    }
-    function runLabelCycle(el: HTMLElement) {
-      typeText(el, TYPE_A, 34, () => {
-        const hold = window.setTimeout(() => {
-          eraseText(el, 14, () => typeText(el, TYPE_B, 34));
-        }, 900);
-        timers.push(hold as unknown as number);
-      });
-    }
-    cleanups.push(() => timers.forEach((t) => { window.clearInterval(t); window.clearTimeout(t); }));
-
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     function revealHero(gsap: any) {
-      // THE ONE SIGNATURE: the type gets measured, then graded.
-      // Vocabulary = motion tokens: expo.out (--ease-reveal), 0.9s/0.6s, 70ms cascade.
-      const eyebrow       = document.querySelector<HTMLElement>('.hero-eyebrow');
-      const headlineLines = document.querySelectorAll<HTMLElement>('#hero-headline .line-mask-inner');
-      const gridlines     = document.querySelectorAll<HTMLElement>('.hero-gridline');
-      const annotation    = document.getElementById('hero-annotation');
-      const dimPaths      = document.querySelectorAll<SVGPathElement>('.hero-dim-path');
-      const regTicks      = document.querySelectorAll<HTMLElement>('.hero-reg-tick');
-      const label         = document.getElementById('hero-dim-label');
-      const seal          = document.getElementById('hero-seal');
-      const heroSub       = document.querySelector<HTMLElement>('.hero-sub');
-      const instrument    = document.getElementById('hero-instrument');
-      const scrollCue     = document.getElementById('hero-scroll-cue');
-      const hero          = document.getElementById('hero');
-
-      // Anchor annotations to the type now and on every resize
-      measureHeroAnnotations();
-      const ro = new ResizeObserver(() => measureHeroAnnotations());
-      const headline = document.getElementById('hero-headline');
-      if (headline) ro.observe(headline);
-      window.addEventListener('resize', measureHeroAnnotations);
-      cleanups.push(() => { ro.disconnect(); window.removeEventListener('resize', measureHeroAnnotations); });
+      // THE SIGNATURE: rule draws → letters rise from the baseline → asterisk
+      // turns in → the stroke letters flicker → the seal stamps the line →
+      // intro, tags, cue. Same vocabulary: expo.out, 0.9/0.6, 70ms cascade.
+      const rule    = document.getElementById('hero-baseline-rule');
+      const letters = document.querySelectorAll<HTMLElement>('.hw-inner');
+      const astSvg  = document.getElementById('hw-ast-svg');
+      const strokes = document.querySelectorAll<HTMLElement>('.hw-stroke');
+      const seal    = document.getElementById('hero-seal');
+      const tags    = document.getElementById('hero-baseline-tags');
+      const intro   = document.getElementById('hero-intro');
+      const cue     = document.getElementById('hero-scroll-cue');
+      const wordmark = document.getElementById('hero-wordmark');
+      const zone    = document.getElementById('hero-wordmark-zone');
+      const hero    = document.getElementById('hero');
 
       if (prefersReduced) {
-        // Full static final state — no animation. CSS reduce-block covers the
-        // class-level states; JS finishes the JS-positioned layers.
-        if (eyebrow) eyebrow.style.opacity = '1';
-        headlineLines.forEach((l) => { l.style.transform = 'none'; });
-        if (annotation) annotation.style.opacity = '1';
-        if (label) label.textContent = TYPE_B;
-        if (heroSub) heroSub.style.opacity = '1';
-        if (instrument) instrument.style.opacity = '1';
-        if (scrollCue) scrollCue.style.opacity = '1';
+        if (rule) rule.style.transform = 'none';
+        letters.forEach((l) => { l.style.transform = 'none'; });
+        if (seal) { seal.style.opacity = '1'; seal.style.transform = 'none'; }
+        [tags, intro, cue].forEach((el) => { if (el) el.style.opacity = '1'; });
         return;
       }
 
       const EASE = 'expo.out';                 // = cubic-bezier(0.16, 1, 0.3, 1)
       const tl = gsap.timeline();
 
-      // 1 · t=0.0 — baseline grid draws in, like engineering paper
-      if (gridlines.length) tl.to(gridlines,
-        { scaleX: 1, duration: 0.9, ease: EASE, stagger: 0.08 },
-        0
-      );
+      // Baseline rule draws in
+      if (rule) tl.to(rule, { scaleX: 1, duration: 0.9, ease: EASE }, 0);
 
-      // 2 · t=0.3 — headline masked rise, line by line.
-      // (y + yPercent both declared: the CSS translateY(102%) initial state parses
-      // back from the matrix as a px `y`, which would survive a yPercent-only tween.)
-      if (headlineLines.length) {
-        gsap.set(headlineLines, { y: 0, yPercent: 102 });
-        tl.to(headlineLines,
-          { y: 0, yPercent: 0, duration: 0.9, ease: EASE, stagger: 0.07 },
-          0.3
-        );
+      // Letters rise from the baseline mask, 70ms cascade
+      // (y + yPercent both declared: the CSS translateY(110%) initial state
+      // parses back from the matrix as px and would survive a yPercent tween.)
+      if (letters.length) {
+        gsap.set(letters, { y: 0, yPercent: 110 });
+        tl.to(letters, { y: 0, yPercent: 0, duration: 0.9, ease: EASE, stagger: 0.07 }, 0.25);
       }
 
-      // 3 · t=0.9 — THE MEASUREMENT: dimension line + ticks draw, label types on
-      if (annotation) tl.set(annotation, { opacity: 1 }, 0.9);
-      if (dimPaths.length) tl.fromTo(dimPaths,
-        { strokeDashoffset: 1 },
-        { strokeDashoffset: 0, duration: 0.7, ease: 'power2.inOut', stagger: 0.06 },
-        0.9
+      // Asterisk turns in as it lands
+      if (astSvg) tl.fromTo(astSvg,
+        { rotation: 90, scale: 0.6, transformOrigin: '50% 50%' },
+        { rotation: 0, scale: 1, duration: 0.6, ease: EASE },
+        0.85
       );
-      if (regTicks.length) tl.to(regTicks,
-        { opacity: 1, duration: 0.4, ease: EASE, stagger: 0.07 },
-        1.1
-      );
-      if (label) tl.call(() => runLabelCycle(label), [], 1.05);
 
-      // 4 · t=1.6 — THE GRADE: the seal stamps in beside the final period
+      // "EX" stroke fill flickers once
+      if (strokes.length) {
+        tl.set(strokes, { color: '#15130E' }, 1.4)
+          .set(strokes, { color: 'transparent' }, 1.47)
+          .set(strokes, { color: '#15130E' }, 1.53)
+          .set(strokes, { color: 'transparent' }, 1.6);
+      }
+
+      // The seal stamps onto the rule
       if (seal) tl.fromTo(seal,
         { opacity: 0, scale: 1.4, rotation: 2 },
         { opacity: 1, scale: 1, rotation: 0, duration: 0.6, ease: EASE },
-        1.6
+        1.7
       );
 
-      // 5 · t=1.9 — eyebrow, sub-line, instrument row, scroll cue, staggered
-      const meta = [eyebrow, heroSub, instrument, scrollCue].filter(Boolean);
+      // Intro, tags, cue
+      const meta = [tags, intro, cue].filter(Boolean);
       if (meta.length) tl.fromTo(meta,
         { opacity: 0, y: 24 },
         { opacity: 1, y: 0, duration: 0.6, ease: EASE, stagger: 0.07 },
-        1.9
+        1.95
       );
 
-      // Idle: label re-types every ~8s; annotation layer drifts ≤4px with the mouse
-      const idleLoop = window.setInterval(() => {
-        if (label && document.visibilityState === 'visible') runLabelCycle(label);
-      }, 8000);
-      timers.push(idleLoop);
+      // Idle: slow asterisk rotation + a ±5px wordmark drift on mouse
+      tl.call(() => {
+        if (astSvg) gsap.to(astSvg, {
+          rotation: '+=360', duration: 90, repeat: -1, ease: 'none',
+          transformOrigin: '50% 50%',
+        });
+      }, [], 2.6);
 
-      const isTouch = window.matchMedia('(pointer: coarse)').matches;
-      const driftEl = document.getElementById('hero-annotation-drift') ?? annotation;
-      if (hero && driftEl && !isTouch) {
+      const finePtr = window.matchMedia('(pointer: fine)').matches;
+      if (hero && wordmark && finePtr) {
+        const xTo = gsap.quickTo(wordmark, 'x', { duration: 0.6, ease: 'power2.out' });
+        const yTo = gsap.quickTo(wordmark, 'y', { duration: 0.6, ease: 'power2.out' });
         const onMove = (e: MouseEvent) => {
-          const dx = (e.clientX / window.innerWidth - 0.5) * 2;
-          const dy = (e.clientY / window.innerHeight - 0.5) * 2;
-          gsap.to(driftEl, { x: dx * 4, y: dy * 4, duration: 0.8, ease: 'power2.out' });
+          xTo((e.clientX / window.innerWidth - 0.5) * 10);
+          yTo((e.clientY / window.innerHeight - 0.5) * 10);
         };
         hero.addEventListener('mousemove', onMove);
         cleanups.push(() => hero.removeEventListener('mousemove', onMove));
+      }
+
+      // Scroll-out: the wordmark zone leaves at 0.9x — a gentle shear
+      if (zone) {
+        ST.create({
+          trigger: '#hero',
+          start: 'top top',
+          end: 'bottom top',
+          scrub: true,
+          onUpdate(self: { progress: number }) {
+            gsap.set(zone, { y: self.progress * window.innerHeight * 0.1 });
+          },
+        });
       }
     }
 

@@ -3,6 +3,29 @@
 import React from 'react';
 import { ArrowDown } from 'lucide-react';
 
+const SOLID_LETTERS = ['V', 'A', 'L', 'I', 'D'];
+const STROKE_LETTERS = ['E', 'X'];
+
+/* Six-spoke asterisk seal-mark — the only colour in the wordmark */
+function AsteriskMark() {
+  return (
+    <svg id="hw-ast-svg" viewBox="0 0 40 40" aria-hidden="true">
+      {[0, 30, 60, 90, 120, 150].map((deg) => (
+        <rect
+          key={deg}
+          x="18.2"
+          y="2"
+          width="3.6"
+          height="36"
+          rx="1.8"
+          fill="currentColor"
+          transform={`rotate(${deg} 20 20)`}
+        />
+      ))}
+    </svg>
+  );
+}
+
 export default function Hero() {
   return (
     <section className="hero" id="hero" data-field="#F4EFE6">
@@ -10,56 +33,32 @@ export default function Hero() {
       {/* Warm radial glow */}
       <div className="hero-atmosphere" aria-hidden="true" />
 
-      {/* Baseline grid — engineering-paper rules, drawn in on load */}
-      <div className="hero-grid" aria-hidden="true">
-        <span className="hero-gridline" />
-        <span className="hero-gridline" />
-        <span className="hero-gridline" />
-        <span className="hero-gridline" />
-      </div>
-
-      {/* Text block — vertically centered, far left, z2 */}
-      <div className="hero-text">
-        <span className="hero-eyebrow">
-          Independent Sustainability Measurement
-        </span>
-
-        {/* Headline + measurement annotations share one anchor box */}
-        <div className="hero-headline-wrap" id="hero-headline-wrap">
-          <h1 className="hero-headline" id="hero-headline">
-            <span className="line-mask">
-              <span className="line-mask-inner hero-headline-arial" id="hl-line-1">
-                <span className="hl-word" data-tag="CLAIM">They</span>{' '}
-                <span className="hl-word" data-tag="CLAIM">Promise,</span>
-              </span>
+      {/* THE WORDMARK — monumental, cropped at both edges */}
+      <div className="hero-wordmark-zone" id="hero-wordmark-zone">
+        <h1 className="hero-wordmark" id="hero-wordmark" aria-label="Validex">
+          {SOLID_LETTERS.map((l) => (
+            <span className="hw-letter" key={l} aria-hidden="true">
+              <span className="hw-inner">{l}</span>
             </span>
-            <span className="line-mask">
-              <span className="line-mask-inner hero-headline-arial" id="hl-line-2">
-                <span className="hl-word" data-tag="AUDIT">We</span>{' '}
-                <span className="hl-word hl-word-verified" data-tag="VERIFIED ✓">Measure.</span>
-              </span>
+          ))}
+          {STROKE_LETTERS.map((l) => (
+            <span className="hw-letter" key={l} aria-hidden="true">
+              <span className="hw-inner hw-stroke">{l}</span>
             </span>
-          </h1>
+          ))}
+          <span className="hw-letter hw-ast" aria-hidden="true">
+            <span className="hw-inner"><AsteriskMark /></span>
+          </span>
+        </h1>
 
-          {/* Annotation layer — dimension line, ticks, typed label.
-              Outer layer takes the scroll shear; inner wrapper takes the mouse drift. */}
-          <div className="hero-annotation" id="hero-annotation" aria-hidden="true">
-            <div className="hero-annotation-drift" id="hero-annotation-drift">
-              <svg className="hero-dim-svg" id="hero-dim-svg" height="36">
-                <path className="hero-dim-path hero-dim-forest" id="dim-tick-l" pathLength={1} />
-                <path className="hero-dim-path" id="dim-tick-r" pathLength={1} />
-                <path className="hero-dim-path" id="dim-line" pathLength={1} />
-                <path className="hero-dim-path" id="dim-arrow-l" pathLength={1} />
-                <path className="hero-dim-path" id="dim-arrow-r" pathLength={1} />
-              </svg>
-              <span className="hero-dim-label" id="hero-dim-label">MEASURED · 2026</span>
-              <span className="hero-reg-tick" id="reg-tick-1" />
-              <span className="hero-reg-tick" id="reg-tick-2" />
-            </div>
+        {/* Baseline rule — full bleed, tagged, with the seal stamped on the line */}
+        <div className="hero-baseline">
+          <span className="hero-baseline-rule" id="hero-baseline-rule" aria-hidden="true" />
+          <div className="hero-baseline-tags" id="hero-baseline-tags">
+            <span className="hero-tag">Independent Sustainability Measurement</span>
+            <span className="hero-tag">EST. 2026 · The Hague</span>
           </div>
-
-          {/* Grade seal — ink-stamped next to the final period */}
-          <svg className="hero-seal" id="hero-seal" viewBox="0 0 64 64" aria-hidden="true">
+          <svg className="hero-seal-line" id="hero-seal" viewBox="0 0 64 64" aria-hidden="true">
             <defs>
               <path
                 id="hero-seal-arc"
@@ -75,33 +74,18 @@ export default function Hero() {
             <text x="32" y="33" className="hero-seal-grade">A</text>
           </svg>
         </div>
+      </div>
 
-        <p className="hero-sub">
+      {/* Intro block — bottom left */}
+      <div className="hero-intro" id="hero-intro">
+        <p className="hero-intro-lead">They promise. We measure.</p>
+        <p className="hero-intro-body">
           The independent measurement layer for sustainability.
           Anchored to ESRS. Built for the sceptic.
         </p>
-
-        {/* Instrument row — ledger-like proof device; the single green tick is the one accent mark */}
-        <div className="hero-instrument" id="hero-instrument">
-          <span className="hero-instrument-rule" aria-hidden="true" />
-          <span className="hero-instrument-tick" aria-hidden="true" />
-          <span>ESRS-Aligned</span>
-          <span className="hero-instrument-sep" aria-hidden="true">·</span>
-          <span>A–E Verified Score</span>
-        </div>
       </div>
 
-      {/* Click-to-stamp layer (SiteScripts spawns mini seals here) */}
-      <div className="hero-stamps" id="hero-stamps" aria-hidden="true" />
-
-      {/* Live crosshair — CAD-style cursor tracking (desktop only, built by JS) */}
-      <div className="hero-crosshair" id="hero-crosshair" aria-hidden="true">
-        <span className="hero-xh-v" id="hero-xh-v" />
-        <span className="hero-xh-h" id="hero-xh-h" />
-        <span className="hero-xh-readout" id="hero-xh-readout"></span>
-      </div>
-
-      {/* Scroll cue — bottom center */}
+      {/* Scroll cue — bottom right */}
       <div className="hero-scroll-cue-wrap" id="hero-scroll-cue">
         <div className="hero-scroll-cue" aria-label="Scroll down">
           <ArrowDown size={16} strokeWidth={1.5} />
