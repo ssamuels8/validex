@@ -76,12 +76,13 @@ export default function SiteScripts() {
           ScrollTrigger.create({
             trigger: el,
             start: 'top 85%',
+            once: true,
             onEnter: () => {
               gsap.to(el, {
                 opacity: 1,
                 y: 0,
-                duration: 0.9,
-                ease: 'power3.out',
+                duration: 0.6,
+                ease: 'expo.out',
               });
             },
           });
@@ -104,7 +105,7 @@ export default function SiteScripts() {
               opacity: 1,
               y: 0,
               duration: 0.6,
-              ease: 'power3.out',
+              ease: 'expo.out',
               stagger: 0.04,
             });
           },
@@ -145,8 +146,8 @@ export default function SiteScripts() {
             start: 'top 78%',
             onEnter: () => {
               gsap.fromTo(pullEl,
-                { opacity: 0, y: 30 },
-                { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' }
+                { opacity: 0, y: 24 },
+                { opacity: 1, y: 0, duration: 0.6, ease: 'expo.out' }
               );
             },
           });
@@ -189,9 +190,9 @@ export default function SiteScripts() {
               gsap.to(card, {
                 opacity: 1,
                 y: 0,
-                duration: 0.7,
-                delay: (i % 2) * 0.1,
-                ease: 'power3.out',
+                duration: 0.6,
+                delay: (i % 2) * 0.07,
+                ease: 'expo.out',
               });
             },
           });
@@ -238,7 +239,13 @@ export default function SiteScripts() {
 
       // ── Score section 2-col reveal ───────────────────────────
       const scoreCols = document.querySelector<HTMLElement>('.score-cols');
-      if (scoreCols) {
+      if (scoreCols && prefersReduced) {
+        scoreCols.querySelectorAll<HTMLElement>('.score-fade-up').forEach((el) => {
+          el.style.opacity = '1'; el.style.transform = 'none';
+        });
+        const wrapEl = document.getElementById('scorecard-wrapper');
+        if (wrapEl) { wrapEl.style.opacity = '1'; wrapEl.style.transform = 'none'; }
+      } else if (scoreCols) {
         const leftEls = scoreCols.querySelectorAll<HTMLElement>('.score-fade-up');
         const scorecardWrapEl = document.getElementById('scorecard-wrapper');
         const depthPanel = scoreCols.querySelector<HTMLElement>('.score-depth-panel');
@@ -250,8 +257,8 @@ export default function SiteScripts() {
             once: true,
             onEnter: () => {
               gsap.to(leftEls, {
-                opacity: 1, y: 0, duration: 0.8,
-                ease: 'power3.out', stagger: 0.12,
+                opacity: 1, y: 0, duration: 0.6,
+                ease: 'expo.out', stagger: 0.07,
               });
             },
           });
@@ -264,8 +271,8 @@ export default function SiteScripts() {
             once: true,
             onEnter: () => {
               gsap.to(scorecardWrapEl, {
-                opacity: 1, y: 0, duration: 1,
-                ease: 'power3.out', delay: 0.2,
+                opacity: 1, y: 0, duration: 0.9,
+                ease: 'expo.out', delay: 0.14,
               });
             },
           });
@@ -278,8 +285,8 @@ export default function SiteScripts() {
             once: true,
             onEnter: () => {
               gsap.to(depthPanel, {
-                y: 0, duration: 1.2,
-                ease: 'power3.out', delay: 0.3,
+                y: 0, duration: 0.9,
+                ease: 'expo.out', delay: 0.21,
               });
             },
           });
@@ -312,12 +319,18 @@ export default function SiteScripts() {
               const delay = parseInt(el.dataset.delay ?? '0', 10);
               setTimeout(() => el.classList.add('sc-visible'), delay);
             });
-            // Bar fills
+            // Bar fills — scaleX, not width (compositor-only)
             scorecardWrapper.querySelectorAll<HTMLElement>('.sc-bar-fill').forEach((bar, i) => {
-              setTimeout(() => { bar.style.width = (bar.dataset.width ?? '0') + '%'; }, 700 + i * 80);
+              setTimeout(() => {
+                bar.style.transform = `scaleX(${Number(bar.dataset.width ?? 0) / 100})`;
+              }, 700 + i * 80);
             });
             // Grade letter scale-in
             scorecardWrapper.querySelectorAll<HTMLElement>('.grade-letter').forEach((letter, i) => {
+              if (prefersReduced) {
+                letter.style.opacity = '1';
+                return;
+              }
               setTimeout(() => {
                 gsap.fromTo(letter,
                   { scale: 0.4, opacity: 0 },
@@ -325,7 +338,7 @@ export default function SiteScripts() {
                 );
               }, 1100 + i * 180);
             });
-            setTimeout(() => scorecardWrapper.classList.add('breathing'), 2400);
+            if (!prefersReduced) setTimeout(() => scorecardWrapper.classList.add('breathing'), 2400);
           },
         });
         // Grade tooltips

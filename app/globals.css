@@ -85,6 +85,17 @@ body::after {
 
 a { color: inherit; text-decoration: none; }
 
+/* Visible keyboard focus everywhere — moss-bright holds ≥3:1 on cream and ink */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[role='tab']:focus-visible {
+  outline: 2px solid var(--moss-bright);
+  outline-offset: 3px;
+}
+
 h1, h2, h3, h4, h5, h6 {
   font-feature-settings: "ss01", "cv01";
   text-rendering: optimizeLegibility;
@@ -104,12 +115,17 @@ h1, h2, h3, h4, h5, h6 {
   .hero-eyebrow, .hero-sub, .hero-instrument,
   .hero-scroll-cue-wrap { opacity: 1 !important; }
   .hero-seal { opacity: 1 !important; transform: none !important; }
+  /* Sitewide: every JS-revealed element renders its final state */
+  .manifesto-word, .problem-pull, .score-fade-up,
+  .chain-card, .sc-reveal { opacity: 1 !important; transform: none !important; }
+  .chain-line path { stroke-dashoffset: 0 !important; }
+  .grade-letter { opacity: 1 !important; }
 }
 
 /* ── Motion: .reveal ────────────────────────────────────── */
 .reveal {
   opacity: 0;
-  transform: translateY(40px);
+  transform: translateY(var(--reveal-y));
 }
 
 /* ── Motion: line-mask reveal ───────────────────────────── */
@@ -428,7 +444,7 @@ h1, h2, h3, h4, h5, h6 {
 /* ── Manifesto ──────────────────────────────────────────── */
 .manifesto {
   background: var(--paper);
-  padding: 18vh 6vw;
+  padding: clamp(14vh, 18vh, 20vh) 6vw;
   border-top: 1px solid var(--line-light);
 }
 .manifesto-line {
@@ -450,7 +466,7 @@ h1, h2, h3, h4, h5, h6 {
 /* ── Who We Are ─────────────────────────────────────────── */
 .who-section {
   background: radial-gradient(ellipse at 50% 35%, var(--ink-soft) 0%, var(--ink) 65%);
-  padding: 20vh 6vw;
+  padding: clamp(14vh, 18vh, 20vh) 6vw;
   border-top: 1px solid var(--line-dark);
 }
 .who-inner { max-width: 1100px; margin: 0 auto; }
@@ -458,7 +474,7 @@ h1, h2, h3, h4, h5, h6 {
   display: block;
   font-size: 0.72rem;
   font-weight: 500;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--moss-bright);
   margin-bottom: 2rem;
@@ -490,7 +506,7 @@ h1, h2, h3, h4, h5, h6 {
 /* ── Market Failure ─────────────────────────────────────── */
 .problem-section {
   background: var(--paper);
-  padding: clamp(12vh, 16vh, 18vh) 6vw;
+  padding: clamp(14vh, 18vh, 20vh) 6vw;
   min-height: 88vh;
   display: flex;
   flex-direction: column;
@@ -657,7 +673,7 @@ h1, h2, h3, h4, h5, h6 {
 /* ── Case Studies — Card Grid ───────────────────────────── */
 .cs-grid-section {
   background: radial-gradient(ellipse at 50% 30%, var(--ink-soft) 0%, var(--ink) 60%);
-  padding: 18vh 6vw;
+  padding: clamp(14vh, 18vh, 20vh) 6vw;
   border-top: 1px solid var(--line-dark);
 }
 .cs-grid-inner { max-width: 1100px; margin: 0 auto; }
@@ -666,7 +682,7 @@ h1, h2, h3, h4, h5, h6 {
   display: block;
   font-size: 0.72rem;
   font-weight: 500;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--moss-bright);
   margin-bottom: 1.5rem;
@@ -765,7 +781,7 @@ h1, h2, h3, h4, h5, h6 {
 /* ── Case Studies — Gallery4 Carousel ──────────────────── */
 .cs-carousel-section {
   background: var(--paper);
-  padding: 18vh 0;
+  padding: clamp(14vh, 18vh, 20vh) 0;
   border-top: 1px solid var(--line-light);
   overflow: hidden;
 }
@@ -782,7 +798,7 @@ h1, h2, h3, h4, h5, h6 {
   display: block;
   font-size: 0.72rem;
   font-weight: 500;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--forest);
   margin-bottom: 1.25rem;
@@ -973,7 +989,7 @@ h1, h2, h3, h4, h5, h6 {
 /* ── System ─────────────────────────────────────────────── */
 .system-section {
   background: var(--paper);
-  padding: 20vh 6vw;
+  padding: clamp(14vh, 18vh, 20vh) 6vw;
   text-align: center;
   border-top: 1px solid var(--line-light);
 }
@@ -982,7 +998,7 @@ h1, h2, h3, h4, h5, h6 {
   display: block;
   font-size: 0.72rem;
   font-weight: 500;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--forest);
   margin-bottom: 2rem;
@@ -1225,8 +1241,10 @@ h1, h2, h3, h4, h5, h6 {
   left: 0; top: 0;
   height: 100%;
   background: var(--paper);
-  width: 0%;
-  transition: width 0.9s ease-out;
+  width: 100%;
+  transform: scaleX(0);          /* animate transform, not width */
+  transform-origin: left center;
+  transition: transform 0.9s ease-out;
 }
 .sc-comp-pct {
   font-size: 0.6rem;
@@ -1442,14 +1460,36 @@ h1, h2, h3, h4, h5, h6 {
   .apply-field-row { flex-direction: column; gap: 1.4rem; }
 }
 
-/* ── Footer ─────────────────────────────────────────────── */
+/* ── Footer — the finale ────────────────────────────────── */
 .site-footer {
   background: var(--ink);
-  padding: 2rem 2.5rem;
+  padding: clamp(8vh, 10vh, 12vh) 6vw 2.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 3.5rem;
+  border-top: 1px solid var(--line-dark);
+  overflow: hidden;
+}
+/* Massive outlined wordmark — stroke-only Arial tight, quiet */
+.footer-wordmark {
+  font-family: Arial, Helvetica, sans-serif !important;
+  font-weight: 700;
+  font-size: 18vw;
+  line-height: 0.8;
+  letter-spacing: -0.05em;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(242, 238, 228, 0.25);
+  white-space: nowrap;
+  user-select: none;
+  display: block;
+}
+.footer-meta {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 1rem;
   border-top: 1px solid var(--line-dark);
+  padding-top: 1.75rem;
 }
 .footer-logo {
   font-weight: 700;
@@ -1664,8 +1704,8 @@ h1, h2, h3, h4, h5, h6 {
   .system-section { padding: 14vh 2rem; }
   .score { padding: 12vh 2rem; }
   .cta-section { padding: 8vh 2rem; }
-  .site-footer { padding: 1.75rem 1.5rem; flex-direction: column; gap: 0.75rem; text-align: center; }
-  .footer-right { justify-content: center; }
+  .site-footer { padding: 8vh 1.5rem 1.5rem; gap: 2rem; }
+  .footer-meta { flex-direction: column; align-items: flex-start; gap: 0.6rem; }
 }
 /* ── Infinite slider keyframe ─────────────────────────── */
 @keyframes infiniteSlide {
