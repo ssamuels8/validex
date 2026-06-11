@@ -417,6 +417,26 @@ export default function SiteScripts() {
         });
       }
 
+      // ── Footer wordmark: stroke fills to solid cream as it enters ──
+      const wmFill = document.getElementById('footer-wordmark-fill');
+      if (wmFill && !prefersReduced) {
+        gsap.fromTo(wmFill,
+          { opacity: 0 },
+          {
+            opacity: 1,
+            ease: 'none',
+            scrollTrigger: {
+              trigger: '.site-footer',
+              start: 'top bottom',
+              end: 'bottom bottom',
+              scrub: true,
+            },
+          }
+        );
+      } else if (wmFill) {
+        wmFill.style.opacity = '1';
+      }
+
       // ── Magnetic buttons (nav pill + apply submit) ──────────────
       document.querySelectorAll<HTMLElement>('#nav-pill-cta, #apply-submit').forEach((btn) => {
         btn.addEventListener('mousemove', (e) => {
