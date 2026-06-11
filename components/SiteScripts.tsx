@@ -10,6 +10,7 @@ export default function SiteScripts() {
     let lenis: any = null;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let ST: any = null;
+    const cleanups: Array<() => void> = [];
 
     async function init() {
       const { default: gsap } = await import('gsap');
@@ -371,19 +372,133 @@ export default function SiteScripts() {
 
     }
 
+    // ── Hero: anchor the measurement annotations to the live type ──
+    // Positions the dimension SVG, label, registration ticks, and seal
+    // against the bounding boxes of the two headline lines. Re-run on resize.
+    function measureHeroAnnotations() {
+      const wrap   = document.getElementById('hero-headline-wrap');
+      const l1     = document.getElementById('hl-line-1');
+      const l2     = document.getElementById('hl-line-2');
+      const svg    = document.getElementById('hero-dim-svg');
+      const label  = document.getElementById('hero-dim-label');
+      const tick1  = document.getElementById('reg-tick-1');
+      const tick2  = document.getElementById('reg-tick-2');
+      const seal   = document.getElementById('hero-seal');
+      if (!wrap || !l1 || !l2 || !svg || !label || !seal) return;
+
+      const wrapR = wrap.getBoundingClientRect();
+      const r1 = l1.getBoundingClientRect();
+      const r2 = l2.getBoundingClientRect();
+      // Use untransformed boxes: during the masked rise the lines are translated
+      // down, which would skew anchors — measure from the mask (parent) instead.
+      const m1 = (l1.parentElement as HTMLElement).getBoundingClientRect();
+      const m2 = (l2.parentElement as HTMLElement).getBoundingClientRect();
+      const w2 = r2.width; // glyph width is unaffected by translateY
+
+      // Dimension line under "We Measure." — full width of the line
+      const W = Math.max(80, Math.round(w2));
+      const dimTop = m2.bottom - wrapR.top + 6;
+      svg.setAttribute('width', String(W));
+      svg.style.left = `${m2.left - wrapR.left}px`;
+      svg.style.top = `${dimTop}px`;
+      const set = (id: string, d: string) => document.getElementById(id)?.setAttribute('d', d);
+      set('dim-line',    `M 10 18 H ${W - 10}`);
+      set('dim-tick-l',  'M 1 8 V 28');
+      set('dim-tick-r',  `M ${W - 1} 8 V 28`);
+      set('dim-arrow-l', 'M 18 12 L 10 18 L 18 24');
+      set('dim-arrow-r', `M ${W - 18} 12 L ${W - 10} 18 L ${W - 18} 24`);
+
+      // Label — beside the line if there is room, otherwise below it
+      const labelW = 170;
+      const roomRight = window.innerWidth - (m2.left + W) > labelW + 40;
+      if (roomRight) {
+        label.style.left = `${m2.left - wrapR.left + W + 16}px`;
+        label.style.top = `${dimTop + 12}px`;
+      } else {
+        label.style.left = `${m2.left - wrapR.left + 10}px`;
+        label.style.top = `${dimTop + 30}px`;
+      }
+
+      // Registration ticks — cap-height of line 1, baseline of line 2
+      if (tick1) {
+        tick1.style.left = `${m1.left - wrapR.left + r1.width + 14}px`;
+        tick1.style.top = `${m1.top - wrapR.top + 2}px`;
+      }
+      if (tick2) {
+        tick2.style.left = `${m2.left - wrapR.left - 20}px`;
+        tick2.style.top = `${m2.bottom - wrapR.top - 14}px`;
+      }
+
+      // Seal — next to the final period, baseline-aligned
+      const sealSize = window.innerWidth <= 640 ? 44 : 64;
+      seal.style.left = `${m2.left - wrapR.left + w2 + 16}px`;
+      seal.style.top = `${m2.bottom - wrapR.top - sealSize - 2}px`;
+    }
+
+    // Typed label — "CLAIM — UNVERIFIED" flips to "MEASURED · 2026"
+    const TYPE_A = 'CLAIM — UNVERIFIED';
+    const TYPE_B = 'MEASURED · 2026';
+    const timers: number[] = [];
+    function typeText(el: HTMLElement, text: string, msPerChar: number, done?: () => void) {
+      let i = 0;
+      el.textContent = '';
+      const t = window.setInterval(() => {
+        i += 1;
+        el.textContent = text.slice(0, i);
+        if (i >= text.length) { window.clearInterval(t); done?.(); }
+      }, msPerChar);
+      timers.push(t);
+    }
+    function eraseText(el: HTMLElement, msPerChar: number, done?: () => void) {
+      const t = window.setInterval(() => {
+        const cur = el.textContent ?? '';
+        el.textContent = cur.slice(0, -1);
+        if (!el.textContent) { window.clearInterval(t); done?.(); }
+      }, msPerChar);
+      timers.push(t);
+    }
+    function runLabelCycle(el: HTMLElement) {
+      typeText(el, TYPE_A, 34, () => {
+        const hold = window.setTimeout(() => {
+          eraseText(el, 14, () => typeText(el, TYPE_B, 34));
+        }, 900);
+        timers.push(hold as unknown as number);
+      });
+    }
+    cleanups.push(() => timers.forEach((t) => { window.clearInterval(t); window.clearTimeout(t); }));
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     function revealHero(gsap: any) {
-      // The ONE orchestrated signature: a calm, staggered load reveal.
-      // Vocabulary = motion tokens: expo.out (--ease-reveal), 0.9s big / 0.6s secondary, 70ms cascade.
+      // THE ONE SIGNATURE: the type gets measured, then graded.
+      // Vocabulary = motion tokens: expo.out (--ease-reveal), 0.9s/0.6s, 70ms cascade.
       const eyebrow       = document.querySelector<HTMLElement>('.hero-eyebrow');
       const headlineLines = document.querySelectorAll<HTMLElement>('#hero-headline .line-mask-inner');
+      const gridlines     = document.querySelectorAll<HTMLElement>('.hero-gridline');
+      const annotation    = document.getElementById('hero-annotation');
+      const dimPaths      = document.querySelectorAll<SVGPathElement>('.hero-dim-path');
+      const regTicks      = document.querySelectorAll<HTMLElement>('.hero-reg-tick');
+      const label         = document.getElementById('hero-dim-label');
+      const seal          = document.getElementById('hero-seal');
       const heroSub       = document.querySelector<HTMLElement>('.hero-sub');
       const instrument    = document.getElementById('hero-instrument');
       const scrollCue     = document.getElementById('hero-scroll-cue');
+      const hero          = document.getElementById('hero');
+
+      // Anchor annotations to the type now and on every resize
+      measureHeroAnnotations();
+      const ro = new ResizeObserver(() => measureHeroAnnotations());
+      const headline = document.getElementById('hero-headline');
+      if (headline) ro.observe(headline);
+      window.addEventListener('resize', measureHeroAnnotations);
+      cleanups.push(() => { ro.disconnect(); window.removeEventListener('resize', measureHeroAnnotations); });
 
       if (prefersReduced) {
+        // Full static final state — no animation. CSS reduce-block covers the
+        // class-level states; JS finishes the JS-positioned layers.
         if (eyebrow) eyebrow.style.opacity = '1';
         headlineLines.forEach((l) => { l.style.transform = 'none'; });
+        if (annotation) annotation.style.opacity = '1';
+        if (label) label.textContent = TYPE_B;
         if (heroSub) heroSub.style.opacity = '1';
         if (instrument) instrument.style.opacity = '1';
         if (scrollCue) scrollCue.style.opacity = '1';
@@ -393,46 +508,67 @@ export default function SiteScripts() {
       const EASE = 'expo.out';                 // = cubic-bezier(0.16, 1, 0.3, 1)
       const tl = gsap.timeline();
 
-      // Eyebrow
-      if (eyebrow) tl.fromTo(eyebrow,
-        { opacity: 0, y: 24 },
-        { opacity: 1, y: 0, duration: 0.6, ease: EASE },
-        0.1
+      // 1 · t=0.0 — baseline grid draws in, like engineering paper
+      if (gridlines.length) tl.to(gridlines,
+        { scaleX: 1, duration: 0.9, ease: EASE, stagger: 0.08 },
+        0
       );
 
-      // Headline — masked lines rise out of nothing, 70ms stagger (the centrepiece).
-      // Normalise GSAP's transform cache first: the CSS `translateY(102%)` initial state
-      // reads back from the computed matrix as a px `y` (~126px), which survives a
-      // yPercent tween and keeps the line clipped. Declaring y:0 + yPercent:102 in a set
-      // overrides that, so animating both to 0 actually lands the line in its mask.
+      // 2 · t=0.3 — headline masked rise, line by line.
+      // (y + yPercent both declared: the CSS translateY(102%) initial state parses
+      // back from the matrix as a px `y`, which would survive a yPercent-only tween.)
       if (headlineLines.length) {
         gsap.set(headlineLines, { y: 0, yPercent: 102 });
         tl.to(headlineLines,
           { y: 0, yPercent: 0, duration: 0.9, ease: EASE, stagger: 0.07 },
-          0.2
+          0.3
         );
       }
 
-      // Sub-line
-      if (heroSub) tl.fromTo(heroSub,
-        { opacity: 0, y: 24 },
-        { opacity: 1, y: 0, duration: 0.6, ease: EASE },
-        0.65
-      );
-
-      // Instrument row
-      if (instrument) tl.fromTo(instrument,
-        { opacity: 0, y: 24 },
-        { opacity: 1, y: 0, duration: 0.6, ease: EASE },
-        0.78
-      );
-
-      // Scroll cue
-      if (scrollCue) tl.fromTo(scrollCue,
-        { opacity: 0 },
-        { opacity: 1, duration: 0.6, ease: EASE },
+      // 3 · t=0.9 — THE MEASUREMENT: dimension line + ticks draw, label types on
+      if (annotation) tl.set(annotation, { opacity: 1 }, 0.9);
+      if (dimPaths.length) tl.fromTo(dimPaths,
+        { strokeDashoffset: 1 },
+        { strokeDashoffset: 0, duration: 0.7, ease: 'power2.inOut', stagger: 0.06 },
         0.9
       );
+      if (regTicks.length) tl.to(regTicks,
+        { opacity: 1, duration: 0.4, ease: EASE, stagger: 0.07 },
+        1.1
+      );
+      if (label) tl.call(() => runLabelCycle(label), [], 1.05);
+
+      // 4 · t=1.6 — THE GRADE: the seal stamps in beside the final period
+      if (seal) tl.fromTo(seal,
+        { opacity: 0, scale: 1.4, rotation: 2 },
+        { opacity: 1, scale: 1, rotation: 0, duration: 0.6, ease: EASE },
+        1.6
+      );
+
+      // 5 · t=1.9 — eyebrow, sub-line, instrument row, scroll cue, staggered
+      const meta = [eyebrow, heroSub, instrument, scrollCue].filter(Boolean);
+      if (meta.length) tl.fromTo(meta,
+        { opacity: 0, y: 24 },
+        { opacity: 1, y: 0, duration: 0.6, ease: EASE, stagger: 0.07 },
+        1.9
+      );
+
+      // Idle: label re-types every ~8s; annotation layer drifts ≤4px with the mouse
+      const idleLoop = window.setInterval(() => {
+        if (label && document.visibilityState === 'visible') runLabelCycle(label);
+      }, 8000);
+      timers.push(idleLoop);
+
+      const isTouch = window.matchMedia('(pointer: coarse)').matches;
+      if (hero && annotation && !isTouch) {
+        const onMove = (e: MouseEvent) => {
+          const dx = (e.clientX / window.innerWidth - 0.5) * 2;
+          const dy = (e.clientY / window.innerHeight - 0.5) * 2;
+          gsap.to(annotation, { x: dx * 4, y: dy * 4, duration: 0.8, ease: 'power2.out' });
+        };
+        hero.addEventListener('mousemove', onMove);
+        cleanups.push(() => hero.removeEventListener('mousemove', onMove));
+      }
     }
 
     init();
@@ -442,6 +578,7 @@ export default function SiteScripts() {
       if (lenis) lenis.destroy();
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       if (ST) ST.getAll().forEach((t: any) => t.kill());
+      cleanups.forEach((fn) => fn());
     };
   }, []);
 
