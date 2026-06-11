@@ -19,15 +19,17 @@ export default function SupplyChain() {
           — not scraped marketing copy.
         </p>
 
-        {/* Process rail — a hairline draws through, cards rise in sequence */}
+        {/* Process rail — hairline draws through, a pulse travels it, cards rise */}
         <div className="chain-rail" id="chain-rail">
           <svg className="chain-line" aria-hidden="true" preserveAspectRatio="none" viewBox="0 0 100 2">
             <path id="chain-line-path" d="M 0 1 H 100" pathLength={1} vectorEffect="non-scaling-stroke" />
           </svg>
+          {/* Data pulse — one forest light travelling the pipeline */}
+          <span className="chain-pulse" id="chain-pulse" aria-hidden="true" />
           {STEPS.map((s) => (
             <article className="chain-card" key={s.idx}>
               <div className="chain-card-top">
-                <span className="chain-card-idx">{s.idx}</span>
+                <span className="chain-card-idx" data-n={s.idx}>{s.idx}</span>
                 <span className="chain-card-tick" aria-hidden="true" />
               </div>
               <h3 className="chain-card-title">{s.title}</h3>

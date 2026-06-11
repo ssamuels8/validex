@@ -120,6 +120,8 @@ h1, h2, h3, h4, h5, h6 {
   /* Sitewide: every JS-revealed element renders its final state */
   .manifesto-word, .problem-pull, .score-fade-up,
   .chain-card, .sc-reveal { opacity: 1 !important; transform: none !important; }
+  .pq-word { opacity: 1 !important; }
+  .problem-scan, .chain-pulse { opacity: 0 !important; }
   .chain-line path { stroke-dashoffset: 0 !important; }
   .taxo-spoke { stroke-dashoffset: 0 !important; }
   .grade-letter { opacity: 1 !important; }
@@ -558,6 +560,18 @@ body.field-mode .score {
   display: flex;
   align-items: baseline;
   margin-bottom: 1.5rem;
+  position: relative;
+}
+/* Scan rule — an instrument reading completing across the digits */
+.problem-scan {
+  position: absolute;
+  left: 0;
+  right: 18%;
+  top: 0;
+  height: 2px;
+  background: var(--paper);
+  opacity: 0;          /* GSAP sweeps once after the count lands */
+  pointer-events: none;
 }
 /* Arial required — !important beats the global * { font-family: ... !important } */
 .problem-stat,
@@ -584,7 +598,10 @@ body.field-mode .score {
   border-left: 2px solid rgba(244,239,230,0.85);
   padding-left: clamp(1.5rem, 2.5vw, 2.5rem);
   font-feature-settings: "ss01";
-  opacity: 0; /* GSAP reveals with y 30→0 on scroll-in */
+}
+.pq-word {
+  display: inline-block;
+  opacity: 0.15;   /* scrub-linked to 1, word by word */
 }
 
 /* ── Data Supply Chain ──────────────────────────────────── */
@@ -652,9 +669,22 @@ body.field-mode .score {
   border: 1px solid var(--line-light);
   border-radius: 12px;
   padding: 1.5rem 1.4rem 1.6rem;
-  opacity: 0;                    /* GSAP staggers in */
+  opacity: 0;                    /* GSAP staggers in with a -2deg settle */
   transform: translateY(24px);
 }
+.chain-card.chain-in {
+  opacity: 1;
+  transform: none;
+  transition: transform var(--dur-ui) var(--ease-ui),
+              border-color var(--dur-ui) var(--ease-ui),
+              box-shadow var(--dur-ui) var(--ease-ui);
+}
+.chain-card.chain-in:hover {
+  transform: translateY(-6px);
+  border-color: var(--forest);
+  box-shadow: 0 14px 30px rgba(21, 19, 14, 0.08);
+}
+.chain-card.chain-in:hover .chain-card-idx { color: var(--forest); }
 .chain-card-top {
   display: flex;
   align-items: center;
@@ -667,6 +697,22 @@ body.field-mode .score {
   font-weight: 500;
   letter-spacing: 0.14em;
   color: var(--on-light);
+  transition: color var(--dur-ui) var(--ease-ui);
+}
+/* Data pulse — one forest light travelling the rail */
+.chain-pulse {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 8px;
+  height: 8px;
+  margin-top: -4px;
+  border-radius: 50%;
+  background: var(--forest);
+  box-shadow: 0 0 10px rgba(26, 77, 51, 0.55);
+  z-index: 0;       /* behind the white cards — visible in the gaps */
+  opacity: 0;       /* GSAP loop fades it in/out at the ends */
+  pointer-events: none;
 }
 /* One forest tick per card — the section's single accent mark */
 .chain-card-tick {
@@ -693,6 +739,7 @@ body.field-mode .score {
 @media (max-width: 900px) {
   .chain-rail { grid-template-columns: 1fr; gap: 1rem; }
   .chain-line { display: none; }
+  .chain-pulse { display: none; }
 }
 
 /* ── Case Studies — Card Grid ───────────────────────────── */

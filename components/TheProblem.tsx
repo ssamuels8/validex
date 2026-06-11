@@ -1,3 +1,6 @@
+const QUOTE =
+  'Not a market inefficiency. A market deliberately left without a measurement system — because measurement would expose how little most of it does.';
+
 export default function TheProblem() {
   return (
     <section className="problem-section" id="problem" data-field="#1A4D33">
@@ -9,6 +12,8 @@ export default function TheProblem() {
           <div className="problem-number-wrap">
             <span className="problem-stat" id="problem-counter">0</span>
             <span className="problem-pct">%</span>
+            {/* Scan rule — sweeps the digits once the count completes */}
+            <span className="problem-scan" id="problem-scan" aria-hidden="true" />
           </div>
           <p className="problem-caption reveal">
             of sustainability reports rely on self-reported data with no
@@ -16,12 +21,14 @@ export default function TheProblem() {
           </p>
         </div>
 
-        {/* RIGHT — pull-quote with moss rule */}
+        {/* RIGHT — pull-quote, revealed word by word on scroll */}
         <div className="problem-right">
-          <blockquote className="problem-pull">
-            Not a market inefficiency. A market deliberately left without a
-            measurement system — because measurement would expose how little
-            most of it does.
+          <blockquote className="problem-pull" aria-label={QUOTE}>
+            {QUOTE.split(' ').map((word, i) => (
+              <span key={i} className="pq-word" aria-hidden="true">
+                {word}&nbsp;
+              </span>
+            ))}
           </blockquote>
         </div>
 

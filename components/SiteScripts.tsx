@@ -156,12 +156,13 @@ export default function SiteScripts() {
         mWords.forEach((w) => { w.style.opacity = '1'; w.style.transform = 'none'; });
       }
 
-      // ── Market Failure: stat count-up + pull-quote reveal ───
+      // ── Market Failure: count-up + scan-reveal + word-by-word scrub ──
       const counterEl = document.getElementById('problem-counter');
-      const pullEl = document.querySelector<HTMLElement>('.problem-pull');
+      const scanEl = document.getElementById('problem-scan');
+      const pqWords = document.querySelectorAll<HTMLElement>('.pq-word');
       if (prefersReduced) {
         if (counterEl) counterEl.textContent = '85';
-        if (pullEl) { pullEl.style.opacity = '1'; pullEl.style.transform = 'none'; }
+        pqWords.forEach((w) => { w.style.opacity = '1'; });
       } else {
         if (counterEl) {
           let fired = false;
@@ -177,30 +178,49 @@ export default function SiteScripts() {
                 duration: 1.4,
                 ease: 'power2.out',
                 onUpdate() { counterEl.textContent = String(Math.round(obj.val)); },
-                onComplete() { counterEl.textContent = '85'; },
+                onComplete() {
+                  counterEl.textContent = '85';
+                  // Scan rule sweeps the digits once — the reading completes
+                  const wrap = counterEl.parentElement;
+                  if (scanEl && wrap) {
+                    gsap.fromTo(scanEl,
+                      { y: 0, opacity: 1 },
+                      { y: wrap.offsetHeight, opacity: 0, duration: 0.7, ease: 'power2.inOut' }
+                    );
+                  }
+                },
               });
             },
           });
         }
-        if (pullEl) {
-          ScrollTrigger.create({
-            trigger: pullEl,
-            start: 'top 78%',
-            onEnter: () => {
-              gsap.fromTo(pullEl,
-                { opacity: 0, y: 24 },
-                { opacity: 1, y: 0, duration: 0.6, ease: 'expo.out' }
-              );
+        // Kinetic text: each word lifts 0.15 → 1, tied to the scrollbar (~60vh)
+        if (pqWords.length) {
+          gsap.to(pqWords, {
+            opacity: 1,
+            stagger: 0.06,
+            ease: 'none',
+            scrollTrigger: {
+              trigger: '.problem-pull',
+              start: 'top 80%',
+              end: '+=60%',
+              scrub: true,
             },
           });
         }
       }
 
-      // ── Supply chain rail: line draws through, cards rise in sequence ──
+      // ── Supply chain rail: line draws, cards settle in, pulse travels ──
       const chainRail = document.getElementById('chain-rail');
       const chainLine = document.getElementById('chain-line-path');
-      const chainCards = document.querySelectorAll<HTMLElement>('.chain-card');
+      const chainPulse = document.getElementById('chain-pulse');
+      const chainCards = Array.from(document.querySelectorAll<HTMLElement>('.chain-card'));
       if (chainRail && !prefersReduced) {
+        // Alternating -2°/+2° settle, origin at the base of each card
+        chainCards.forEach((c, i) => {
+          gsap.set(c, { rotation: i % 2 === 0 ? -2 : 2, transformOrigin: '50% 100%' });
+          const idxEl = c.querySelector<HTMLElement>('.chain-card-idx');
+          if (idxEl) idxEl.textContent = '00'; // counts up to its real index on reveal
+        });
         ScrollTrigger.create({
           trigger: chainRail,
           start: 'top 80%',
@@ -210,14 +230,44 @@ export default function SiteScripts() {
               { strokeDashoffset: 1 },
               { strokeDashoffset: 0, duration: 1.2, ease: 'power2.inOut' }
             );
-            if (chainCards.length) gsap.to(chainCards, {
-              opacity: 1, y: 0, duration: 0.6, ease: 'expo.out', stagger: 0.07, delay: 0.15,
+            gsap.to(chainCards, {
+              opacity: 1, y: 0, rotation: 0,
+              duration: 0.6, ease: 'expo.out', stagger: 0.07, delay: 0.15,
+              onComplete() {
+                // Hand the cards to CSS so :hover lift works (inline transform cleared)
+                chainCards.forEach((c) => c.classList.add('chain-in'));
+                gsap.set(chainCards, { clearProps: 'transform,opacity' });
+              },
             });
+            // Index numbers count 00 → 0N
+            chainCards.forEach((c, i) => {
+              const idxEl = c.querySelector<HTMLElement>('.chain-card-idx');
+              if (!idxEl) return;
+              const obj = { v: 0 };
+              gsap.to(obj, {
+                v: i + 1, duration: 0.6, delay: 0.2 + i * 0.07, ease: 'power2.out',
+                onUpdate() { idxEl.textContent = String(Math.round(obj.v)).padStart(2, '0'); },
+              });
+            });
+            // THE PULSE — one forest light flowing the pipeline, ~6s loop
+            if (chainPulse && window.innerWidth > 900) {
+              const ptl = gsap.timeline({ repeat: -1, defaults: { ease: 'none' }, delay: 1.2 });
+              ptl.fromTo(chainPulse, { x: 0 }, { x: () => chainRail.clientWidth, duration: 6 }, 0)
+                 .fromTo(chainPulse, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.45 }, 0)
+                 .to(chainPulse, { autoAlpha: 0, duration: 0.45 }, 5.55);
+              const onChainResize = () => ptl.invalidate();
+              window.addEventListener('resize', onChainResize);
+              cleanups.push(() => { window.removeEventListener('resize', onChainResize); ptl.kill(); });
+            }
           },
         });
       } else {
         if (chainLine) chainLine.style.strokeDashoffset = '0';
-        chainCards.forEach((c) => { c.style.opacity = '1'; c.style.transform = 'none'; });
+        chainCards.forEach((c) => {
+          c.classList.add('chain-in');
+          const idxEl = c.querySelector<HTMLElement>('.chain-card-idx');
+          if (idxEl) idxEl.textContent = idxEl.dataset.n ?? idxEl.textContent;
+        });
       }
 
       // ── Case study cards stagger reveal ────────────────────────
