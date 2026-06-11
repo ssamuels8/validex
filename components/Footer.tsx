@@ -52,7 +52,7 @@ export default function Footer() {
           <span className="footer-col-label">Contact</span>
           <ul className="footer-list">
             <li><span className="footer-line">The Hague, NL</span></li>
-            <li><a className="footer-link" href="/#apply">Apply for the pilot →</a></li>
+            <li><a className="footer-link" href="/apply">Apply for the pilot →</a></li>
           </ul>
         </div>
       </div>

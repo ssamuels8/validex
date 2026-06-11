@@ -136,13 +136,13 @@ body.field-mode .problem-section,
 body.field-mode .chain-section,
 body.field-mode .cs-carousel-section,
 body.field-mode .system-section,
+body.field-mode .apply-section,
 body.field-mode .site-footer {
   background: transparent;
 }
 /* Dark sections keep their centre glow as a translucent overlay */
 body.field-mode .who-section,
-body.field-mode .score,
-body.field-mode .apply-section {
+body.field-mode .score {
   background: radial-gradient(ellipse at 50% 35%, rgba(242, 238, 228, 0.045) 0%, transparent 65%);
 }
 
@@ -1330,46 +1330,156 @@ body.field-mode .apply-section {
   font-family: var(--font-mono), 'DM Mono', monospace !important;
 }
 
-/* ── Apply — scoring pilot application ──────────────────── */
+/* ── Apply — statement section (home) ───────────────────── */
 .apply-section {
-  background: radial-gradient(ellipse at 50% 35%, var(--ink-soft) 0%, var(--ink) 65%);
+  background: var(--paper);
   padding: clamp(14vh, 18vh, 20vh) 6vw;
-  border-top: 1px solid var(--line-dark);
-}
-.apply-inner {
-  max-width: 1180px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: 0.9fr 1.1fr;
-  gap: clamp(3rem, 6vw, 6rem);
+  border-top: 1px solid var(--line-light);
+  display: flex;
   align-items: center;
+  justify-content: center;
+  min-height: 80vh;
+  text-align: center;
 }
-.apply-eyebrow {
+.apply-statement { max-width: 1100px; }
+.apply-st-eyebrow {
   display: block;
   font-size: 0.72rem;
   font-weight: 500;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--moss-bright); /* forest is illegible on ink — lighter green on dark */
+  color: var(--forest);
   margin-bottom: 2rem;
   font-family: var(--font-mono), 'DM Mono', monospace !important;
 }
-/* Arial tight display voice, on dark */
-.apply-headline {
+.apply-st-headline {
   font-family: Arial, Helvetica, sans-serif !important;
-  font-size: clamp(2.8rem, 5.5vw, 5.5rem);
+  font-size: clamp(4rem, 10vw, 10rem);
   font-weight: 700;
-  letter-spacing: -0.04em;
-  line-height: 0.9;
-  color: var(--paper);
-  margin-bottom: 1.5rem;
+  letter-spacing: -0.05em;
+  line-height: 0.85;
+  color: var(--ink);
+  margin-bottom: 2rem;
 }
-.apply-sub {
+.apply-st-sub {
   font-size: var(--body);
   font-weight: 400;
   line-height: 1.6;
-  color: var(--on-dark);
-  max-width: 38ch;
+  color: var(--on-light);
+  max-width: 46ch;
+  margin: 0 auto 3rem;
+}
+.apply-st-cta {
+  display: inline-block;
+  font-family: var(--font-mono), 'DM Mono', monospace !important;
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  background: var(--ink);
+  color: var(--paper);
+  border-radius: 999px;
+  padding: 1.35rem 3rem;
+  transition: background var(--dur-ui) var(--ease-ui), scale var(--dur-ui) var(--ease-ui);
+  will-change: transform;
+}
+.apply-st-cta:hover { background: var(--moss); scale: 1.03; }
+
+/* ── /apply — the application page ──────────────────────── */
+.apply-page {
+  position: relative;
+  background: var(--paper);
+  min-height: 100vh;
+  padding: clamp(9rem, 16vh, 12rem) 6vw 12vh;
+  overflow: hidden;
+}
+/* Entry wipe — forest panel exits upward to reveal the page */
+.apply-wipe {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: var(--forest);
+  pointer-events: none;
+  animation: applyWipe 0.8s var(--ease-reveal) 0.1s both;
+}
+@keyframes applyWipe {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-101%); }
+}
+/* Floating paths backdrop */
+.floating-paths {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+.fp {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 1;
+  opacity: 0.05;
+  animation-name: fpDrift;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+  will-change: transform;
+}
+.fp-forest { stroke: var(--forest); opacity: 0.12; }
+@keyframes fpDrift {
+  from { transform: translate(-22px, -14px); }
+  to   { transform: translate(22px, 14px); }
+}
+.apply-nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem 2.5rem;
+}
+.apply-back {
+  font-family: var(--font-mono), 'DM Mono', monospace !important;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--on-light);
+  transition: color var(--dur-ui) var(--ease-ui);
+}
+.apply-back:hover { color: var(--ink); }
+.apply-page-inner {
+  position: relative;
+  z-index: 1;
+  max-width: 640px;
+  margin: 0 auto;
+}
+.apply-page-eyebrow {
+  display: block;
+  font-family: var(--font-mono), 'DM Mono', monospace !important;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--forest);
+  margin-bottom: 1.5rem;
+}
+.apply-page-title {
+  font-family: Arial, Helvetica, sans-serif !important;
+  font-size: clamp(2.6rem, 6vw, 4.5rem);
+  font-weight: 700;
+  letter-spacing: -0.045em;
+  line-height: 0.9;
+  color: var(--ink);
+  margin-bottom: 1.25rem;
+}
+.apply-page-sub {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--on-light);
+  margin-bottom: 3rem;
 }
 
 /* The application card — dashboard-white surface on the dark band */
@@ -1377,7 +1487,7 @@ body.field-mode .apply-section {
   background: var(--surface);
   border: 1px solid var(--line-light);
   border-radius: 16px;
-  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 24px 60px rgba(21, 19, 14, 0.12);
   padding: clamp(1.75rem, 3vw, 2.75rem);
   display: flex;
   flex-direction: column;
@@ -1480,7 +1590,6 @@ body.field-mode .apply-section {
 }
 
 @media (max-width: 960px) {
-  .apply-inner { grid-template-columns: 1fr; }
   .apply-field-row { flex-direction: column; gap: 1.4rem; }
 }
 
