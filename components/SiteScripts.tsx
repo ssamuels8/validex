@@ -145,7 +145,6 @@ export default function SiteScripts() {
           onEnter: () => {
             gsap.to(mWords, {
               opacity: 1,
-              y: 0,
               duration: 0.6,
               ease: 'expo.out',
               stagger: 0.04,

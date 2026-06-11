@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { DM_Sans, DM_Mono, Bricolage_Grotesque } from 'next/font/google';
+import { DM_Sans, DM_Mono, Bricolage_Grotesque, Instrument_Serif } from 'next/font/google';
 import './globals.css';
 
 const dmSans = DM_Sans({
@@ -20,6 +20,14 @@ const bricolage = Bricolage_Grotesque({
   subsets: ['latin'],
   weight: ['700', '800'],
   variable: '--font-display',
+  display: 'swap',
+});
+
+// The numeral voice — used exclusively for display numbers
+const instrumentSerif = Instrument_Serif({
+  subsets: ['latin'],
+  weight: '400',
+  variable: '--font-numeral',
   display: 'swap',
 });
 
@@ -60,7 +68,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${dmSans.variable} ${dmMono.variable} ${bricolage.variable}`}>
+    <html lang="en" className={`${dmSans.variable} ${dmMono.variable} ${bricolage.variable} ${instrumentSerif.variable}`}>
       <body>{children}</body>
     </html>
   );

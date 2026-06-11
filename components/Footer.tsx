@@ -15,7 +15,7 @@ const LEGAL_LINKS = [
 
 export default function Footer() {
   return (
-    <footer className="site-footer" data-field="#15130E">
+    <footer className="site-footer surface-ink" data-field="#15130E">
       {/* The finale — outlined wordmark; fills to solid cream as it enters */}
       <div className="footer-wordmark-wrap" aria-hidden="true">
         <span className="footer-wordmark">Validex.</span>
@@ -58,7 +58,7 @@ export default function Footer() {
       </div>
 
       <div className="footer-meta">
-        <span className="footer-copy">© 2026 Validex · The Hague · All rights reserved</span>
+        <span className="footer-copy">© <span className="footer-year">2026</span> Validex · The Hague · All rights reserved</span>
         <span className="footer-copy">ESRS · EU TAXONOMY ALIGNED</span>
       </div>
     </footer>

@@ -3,7 +3,7 @@ const QUOTE =
 
 export default function TheProblem() {
   return (
-    <section className="problem-section" id="problem" data-field="#1A4D33">
+    <section className="problem-section surface-forest" id="problem" data-field="#1A4D33">
       <span className="problem-eyebrow reveal">The Market Failure</span>
       <div className="problem-grid">
 

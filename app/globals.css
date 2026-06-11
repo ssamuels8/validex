@@ -120,11 +120,38 @@ h1, h2, h3, h4, h5, h6 {
   /* Sitewide: every JS-revealed element renders its final state */
   .manifesto-word, .problem-pull, .score-fade-up,
   .chain-card, .sc-reveal { opacity: 1 !important; transform: none !important; }
-  .pq-word { opacity: 1 !important; }
+  .pq-word, .manifesto-word { opacity: 1 !important; }
   .problem-scan, .chain-pulse { opacity: 0 !important; }
   .chain-line path { stroke-dashoffset: 0 !important; }
   .taxo-spoke { stroke-dashoffset: 0 !important; }
   .grade-letter { opacity: 1 !important; }
+}
+
+
+/* ── Luxe dark surfaces — tonal gradients + light, never flat ── */
+.surface-forest {
+  background:
+    radial-gradient(120% 90% at 75% 10%, rgba(74, 138, 94, 0.16) 0%, transparent 55%),
+    linear-gradient(165deg, #143C28 0%, #0E2B1D 45%, #081A12 100%);
+  box-shadow: inset 0 0 160px rgba(0, 0, 0, 0.35);  /* soft vignette */
+}
+.surface-ink {
+  background:
+    radial-gradient(110% 80% at 70% 12%, rgba(242, 238, 228, 0.05) 0%, transparent 55%),
+    linear-gradient(170deg, #1A1813 0%, #121009 55%, #0B0A06 100%);
+  box-shadow: inset 0 0 160px rgba(0, 0, 0, 0.35);
+}
+/* In field-mode the body carries the base hue; surfaces keep their tonality
+   as translucent overlays so the morph still breathes underneath. */
+body.field-mode .surface-forest {
+  background:
+    radial-gradient(120% 90% at 75% 10%, rgba(74, 138, 94, 0.16) 0%, transparent 55%),
+    linear-gradient(165deg, rgba(20, 60, 40, 0.5) 0%, rgba(14, 43, 29, 0.66) 45%, rgba(8, 26, 18, 0.82) 100%);
+}
+body.field-mode .surface-ink {
+  background:
+    radial-gradient(110% 80% at 70% 12%, rgba(242, 238, 228, 0.05) 0%, transparent 55%),
+    linear-gradient(170deg, rgba(26, 24, 19, 0.45) 0%, rgba(18, 16, 9, 0.62) 55%, rgba(11, 10, 6, 0.8) 100%);
 }
 
 /* ── Colour-field choreography ───────────────────────────
@@ -135,18 +162,10 @@ h1, h2, h3, h4, h5, h6 {
 body.field-mode .hero,
 body.field-mode .framework-strip,
 body.field-mode .manifesto,
-body.field-mode .problem-section,
 body.field-mode .chain-section,
 body.field-mode .cs-carousel-section,
-body.field-mode .system-section,
-body.field-mode .apply-section,
-body.field-mode .site-footer {
+body.field-mode .apply-section {
   background: transparent;
-}
-/* Dark sections keep their centre glow as a translucent overlay */
-body.field-mode .who-section,
-body.field-mode .score {
-  background: radial-gradient(ellipse at 50% 35%, rgba(242, 238, 228, 0.045) 0%, transparent 65%);
 }
 
 /* ── Motion: .reveal ────────────────────────────────────── */
@@ -203,17 +222,15 @@ body.field-mode .score {
   align-items: center;
   justify-content: space-between;
   padding: 1.5rem 2.5rem;
-  transition: background 0.4s ease, backdrop-filter 0.4s ease;
-}
-.site-nav.scrolled {
-  background: rgba(242,238,228,0.72);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  /* Fully transparent over the morphing body — difference blend keeps the
+     wordmark + pill legible on every colour field. No backdrop band. */
+  background: transparent;
+  mix-blend-mode: difference;
 }
 .nav-logo {
   font-weight: 700;
   font-size: 1.1rem;
-  color: var(--ink);
+  color: var(--paper);   /* under difference: dark on cream, light on ink */
   letter-spacing: -0.01em;
 }
 .nav-pill-cta {
@@ -222,15 +239,15 @@ body.field-mode .score {
   font-weight: 500;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  background: var(--ink);
-  color: var(--paper);
+  background: var(--paper); /* inverts per field under difference */
+  color: var(--ink);
   border-radius: 999px;
   padding: 0.65rem 1.4rem;
-  transition: background 0.25s;
+  transition: opacity 0.25s;
   will-change: transform;
   white-space: nowrap;
 }
-.nav-pill-cta:hover { background: var(--moss); }
+.nav-pill-cta:hover { opacity: 0.82; }
 
 /* ── Hero ───────────────────────────────────────────────── */
 .hero {
@@ -624,14 +641,12 @@ body.field-mode .score {
 }
 .manifesto-word {
   display: inline-block;
-  opacity: 0;
-  transform: translateY(12px);
+  opacity: 0.28;   /* ghost — full copy fades in per word */
   margin-right: 0.3em;
 }
 
 /* ── Who We Are ─────────────────────────────────────────── */
 .who-section {
-  background: radial-gradient(ellipse at 50% 35%, var(--ink-soft) 0%, var(--ink) 65%);
   padding: clamp(14vh, 18vh, 20vh) 6vw;
   border-top: 1px solid var(--line-dark);
 }
@@ -671,7 +686,6 @@ body.field-mode .score {
 /* ── Problem ────────────────────────────────────────────── */
 /* ── Market Failure ─────────────────────────────────────── */
 .problem-section {
-  background: var(--forest);
   padding: clamp(14vh, 18vh, 20vh) 6vw;
   min-height: 88vh;
   display: flex;
@@ -713,14 +727,16 @@ body.field-mode .score {
   pointer-events: none;
 }
 /* Arial required — !important beats the global * { font-family: ... !important } */
+/* The numeral voice — Instrument Serif, numbers only */
 .problem-stat,
 .problem-pct {
-  font-family: Arial, Helvetica, sans-serif !important;
-  font-weight: 700;
-  font-size: clamp(7rem, 15vw, 15rem);
-  letter-spacing: -0.04em;
-  line-height: 0.88;
+  font-family: var(--font-numeral), 'Instrument Serif', Georgia, serif !important;
+  font-weight: 400;
+  font-size: clamp(8rem, 16vw, 16rem);
+  letter-spacing: -0.01em;
+  line-height: 0.85;
   color: var(--paper);
+  text-shadow: 0 0 60px rgba(242, 238, 228, 0.12);
 }
 .problem-caption {
   font-size: 1rem;
@@ -740,7 +756,7 @@ body.field-mode .score {
 }
 .pq-word {
   display: inline-block;
-  opacity: 0.15;   /* scrub-linked to 1, word by word */
+  opacity: 0.28;   /* ghost at 28% cream — never illegible, scrubbed to 1 */
 }
 
 /* ── Data Supply Chain ──────────────────────────────────── */
@@ -831,10 +847,10 @@ body.field-mode .score {
   margin-bottom: 1.4rem;
 }
 .chain-card-idx {
-  font-family: var(--font-mono), 'DM Mono', monospace !important;
-  font-size: 0.66rem;
-  font-weight: 500;
-  letter-spacing: 0.14em;
+  font-family: var(--font-numeral), 'Instrument Serif', Georgia, serif !important;
+  font-size: 1.15rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
   color: var(--on-light);
   transition: color var(--dur-ui) var(--ease-ui);
 }
@@ -1105,11 +1121,11 @@ body.field-mode .score {
   justify-content: space-between;
 }
 .cs-card-index {
-  font-size: 0.7rem;
-  font-weight: 500;
-  letter-spacing: 0.16em;
+  font-size: 1.05rem;
+  font-weight: 400;
+  letter-spacing: 0.04em;
   color: var(--on-dark);
-  font-family: var(--font-mono), 'DM Mono', monospace !important;
+  font-family: var(--font-numeral), 'Instrument Serif', Georgia, serif !important;
 }
 .cs-card-category {
   font-size: 0.7rem;
@@ -1199,7 +1215,6 @@ body.field-mode .score {
 
 /* ── System ─────────────────────────────────────────────── */
 .system-section {
-  background: var(--forest);
   padding: clamp(14vh, 18vh, 20vh) 6vw;
   text-align: center;
   border-top: 1px solid var(--line-forest);
@@ -1345,7 +1360,6 @@ body.field-mode .score {
 
 /* ── Score ──────────────────────────────────────────────── */
 .score {
-  background: radial-gradient(ellipse at 50% 35%, var(--ink-soft) 0%, var(--ink) 65%);
   padding: clamp(14vh, 18vh, 20vh) 6vw;
   border-top: 1px solid var(--line-dark);
 }
@@ -1843,7 +1857,6 @@ body.field-mode .score {
 
 /* ── Footer — the finale ────────────────────────────────── */
 .site-footer {
-  background: var(--ink);
   padding: clamp(8vh, 10vh, 12vh) 6vw 2.25rem;
   display: flex;
   flex-direction: column;
@@ -1922,6 +1935,11 @@ body.field-mode .score {
   gap: 1rem;
   border-top: 1px solid var(--line-dark);
   padding-top: 1.75rem;
+}
+.footer-year {
+  font-family: var(--font-numeral), 'Instrument Serif', Georgia, serif !important;
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
 }
 
 /* ── Legal pages ────────────────────────────────────────── */

@@ -28,7 +28,7 @@ const nodes = COMPONENTS.map((comp, i) => {
 
 export default function System() {
   return (
-    <section className="system-section" id="system" data-field="#1A4D33">
+    <section className="system-section surface-forest" id="system" data-field="#1A4D33">
       <div className="system-cols">
 
         {/* LEFT — cream on green */}
