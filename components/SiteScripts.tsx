@@ -295,39 +295,22 @@ export default function SiteScripts() {
         });
       }
 
-      // ── Taxonomy instrument: assembly → slow rotation → hover/lock ──
+      // ── Taxonomy diagram: entrance once, hover/lock. Static at idle. ──
       const taxoSvg = document.getElementById('taxo-svg');
       if (taxoSvg) {
-        const taxoRing = document.getElementById('taxo-ring');
         const taxoSpokes = Array.from(document.querySelectorAll<SVGLineElement>('.taxo-spoke'));
         const taxoNodes = Array.from(document.querySelectorAll<SVGGElement>('.taxo-node'));
         const taxoInners = Array.from(document.querySelectorAll<SVGGElement>('.taxo-node-inner'));
+        const taxoNames = Array.from(document.querySelectorAll<SVGTextElement>('.taxo-name'));
         const taxoCenter = document.getElementById('taxo-center');
         const taxoDetail = document.getElementById('taxo-detail');
         const finePointer = window.matchMedia('(pointer: fine)').matches;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        let ringTween: any = null;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const counterTweens: any[] = [];
         let taxoLocked = -1;
 
-        const startRotation = () => {
-          // Idle: 60s/rev, linear; labels counter-rotate to stay upright.
-          // Skipped on touch (no hover to pause it) and under reduced motion.
-          if (prefersReduced || !finePointer || !taxoRing) return;
-          ringTween = gsap.to(taxoRing, {
-            rotation: 360, duration: 60, repeat: -1, ease: 'none', svgOrigin: '320 320',
-          });
-          taxoInners.forEach((el) => {
-            counterTweens.push(gsap.to(el, {
-              rotation: -360, duration: 60, repeat: -1, ease: 'none', transformOrigin: '0px 0px',
-            }));
-          });
-        };
-
         if (!prefersReduced) {
-          gsap.set(taxoInners, { scale: 0, transformOrigin: '0px 0px' });
-          if (taxoCenter) gsap.set(taxoCenter, { scale: 0, svgOrigin: '320 320' });
+          gsap.set(taxoInners, { scale: 0.6, autoAlpha: 0, transformOrigin: '0px 0px' });
+          gsap.set(taxoNames, { autoAlpha: 0 });
+          if (taxoCenter) gsap.set(taxoCenter, { scale: 0, svgOrigin: '450 450' });
           ScrollTrigger.create({
             trigger: taxoSvg,
             start: 'top 75%',
@@ -335,33 +318,25 @@ export default function SiteScripts() {
             onEnter: () => {
               gsap.fromTo(taxoSpokes,
                 { strokeDashoffset: 1 },
-                { strokeDashoffset: 0, duration: 0.8, ease: 'power2.inOut', stagger: 0.05 }
+                { strokeDashoffset: 0, duration: 0.7, ease: 'power2.inOut', stagger: 0.06 }
               );
               gsap.to(taxoInners, {
-                scale: 1, duration: 0.5, ease: 'back.out(1.6)', stagger: 0.06, delay: 0.35,
+                scale: 1, autoAlpha: 1, duration: 0.45, ease: 'back.out(1.6)', stagger: 0.06, delay: 0.4,
+              });
+              gsap.to(taxoNames, {
+                autoAlpha: 1, duration: 0.5, ease: 'expo.out', stagger: 0.05, delay: 0.9,
               });
               if (taxoCenter) gsap.to(taxoCenter, {
-                scale: 1, duration: 0.6, ease: 'expo.out', delay: 1.15, onComplete: startRotation,
+                scale: 1, duration: 0.6, ease: 'expo.out', delay: 1.5,
               });
             },
           });
         }
 
-        const taxoPause = (on: boolean) => {
-          [ringTween, ...counterTweens].forEach((t) => {
-            if (t) gsap.to(t, { timeScale: on ? 0 : 1, duration: 0.5 });
-          });
-        };
         const taxoActivate = (i: number, on: boolean) => {
           taxoNodes.forEach((n, j) => {
             n.classList.toggle('active', on && j === i);
             n.classList.toggle('dim', on && j !== i);
-            if (!prefersReduced) {
-              gsap.to(n.querySelector('.taxo-node-inner'), {
-                scale: on && j === i ? 1.15 : 1,
-                duration: 0.25, ease: 'power2.out', transformOrigin: '0px 0px',
-              });
-            }
           });
           taxoSpokes.forEach((sp, j) => {
             sp.classList.toggle('active', on && j === i);
@@ -377,27 +352,17 @@ export default function SiteScripts() {
         };
         taxoNodes.forEach((n, i) => {
           if (finePointer) {
-            n.addEventListener('mouseenter', () => {
-              if (taxoLocked >= 0) return;
-              taxoPause(true);
-              taxoActivate(i, true);
-            });
-            n.addEventListener('mouseleave', () => {
-              if (taxoLocked >= 0) return;
-              taxoPause(false);
-              taxoActivate(i, false);
-            });
+            n.addEventListener('mouseenter', () => { if (taxoLocked < 0) taxoActivate(i, true); });
+            n.addEventListener('mouseleave', () => { if (taxoLocked < 0) taxoActivate(i, false); });
           }
           n.addEventListener('click', () => {
             if (taxoLocked === i) {
               taxoLocked = -1;
               taxoActivate(i, false);
-              taxoPause(false);
               taxoDetail?.classList.remove('show');
             } else {
               if (taxoLocked >= 0) taxoActivate(taxoLocked, false);
               taxoLocked = i;
-              taxoPause(true);
               taxoActivate(i, true);
               taxoShowDetail(i);
             }

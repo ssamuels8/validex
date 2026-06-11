@@ -1059,75 +1059,59 @@ body.field-mode .apply-section {
 .taxo-wrap { width: 100%; }
 #taxo-svg { width: 100%; height: auto; overflow: visible; }
 
-/* Spokes — drawn at assembly */
+/* Spokes — disc edge to node edge, drawn once at entrance */
 .taxo-spoke {
-  stroke: var(--line-forest);
+  stroke: rgba(244, 239, 230, 0.18);
   stroke-width: 1;
   fill: none;
   stroke-dasharray: 1;
-  stroke-dashoffset: 1;  /* assembly draws to 0 */
+  stroke-dashoffset: 1;  /* entrance draws to 0 */
   transition: stroke var(--dur-ui) var(--ease-ui), opacity var(--dur-ui) var(--ease-ui);
 }
-.taxo-spoke.active { stroke: var(--paper); stroke-width: 2; }
-.taxo-spoke.dim { opacity: 0.4; }
+.taxo-spoke.active { stroke: rgba(244, 239, 230, 0.6); stroke-width: 2; }
+.taxo-spoke.dim { opacity: 0.35; }
 
 /* Nodes */
 .taxo-node { cursor: pointer; transition: opacity var(--dur-ui) var(--ease-ui); }
-.taxo-node.dim { opacity: 0.4; }
+.taxo-node.dim { opacity: 0.35; }
 .taxo-node-circle {
-  fill: rgba(244, 239, 230, 0.07);
-  stroke: rgba(244, 239, 230, 0.55);
+  fill: transparent;
+  stroke: rgba(244, 239, 230, 0.45);
   stroke-width: 1;
   transition: fill var(--dur-ui) var(--ease-ui), stroke var(--dur-ui) var(--ease-ui);
 }
 .taxo-node:hover .taxo-node-circle,
 .taxo-node.active .taxo-node-circle {
-  fill: rgba(244, 239, 230, 0.16);
+  fill: rgba(244, 239, 230, 0.08);
   stroke: var(--paper);
 }
 .taxo-node-id {
   fill: var(--paper);
-  font-size: 10px;
+  font-size: 15px;
   font-weight: 500;
   text-anchor: middle;
   dominant-baseline: central;
   font-family: var(--font-mono), 'DM Mono', monospace;
   letter-spacing: 0.06em;
 }
-.taxo-node-label {
-  fill: rgba(244, 239, 230, 0.85);
-  font-size: 9.5px;
+/* Component names — outside the ring, never over disc or spokes */
+.taxo-name {
+  fill: rgba(244, 239, 230, 0.75);
+  font-size: 15px;
   font-weight: 500;
   text-anchor: middle;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   font-family: var(--font-mono), 'DM Mono', monospace;
+  transition: fill var(--dur-ui) var(--ease-ui);
 }
-/* Chip — full name + unit, appears on hover/lock */
-.taxo-chip { opacity: 0; pointer-events: none; transition: opacity var(--dur-ui) var(--ease-ui); }
-.taxo-node.active .taxo-chip,
-.taxo-node:hover .taxo-chip { opacity: 1; }
-.taxo-chip rect { fill: var(--paper); }
-.taxo-chip-name {
-  fill: var(--ink);
-  font-size: 9px;
-  font-weight: 500;
-  text-anchor: middle;
-  font-family: var(--font-mono), 'DM Mono', monospace;
-}
-.taxo-chip-unit {
-  fill: var(--forest);
-  font-size: 8.5px;
-  font-weight: 500;
-  text-anchor: middle;
-  letter-spacing: 0.08em;
-  font-family: var(--font-mono), 'DM Mono', monospace;
-}
+.taxo-node:hover .taxo-name,
+.taxo-node.active .taxo-name { fill: var(--paper); }
 /* Center disc */
 .taxo-center-circle { fill: var(--paper); }
 .taxo-center-label {
   fill: var(--ink);
-  font-size: 12px;
+  font-size: 19px;
   font-weight: 500;
   text-anchor: middle;
   letter-spacing: 0.14em;
@@ -2009,6 +1993,9 @@ body.field-mode .apply-section {
   .system-section { padding: 14vh 2rem; }
   .system-cols { grid-template-columns: 1fr; }
   .system-right { min-height: 0; }
+  .taxo-name { font-size: 21px; }
+  .taxo-node-id { font-size: 19px; }
+  .taxo-center-label { font-size: 23px; }
   .score { padding: 12vh 2rem; }
   .cta-section { padding: 8vh 2rem; }
   .site-footer { padding: 8vh 1.5rem 1.5rem; gap: 2rem; }
