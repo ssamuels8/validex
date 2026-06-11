@@ -564,6 +564,118 @@ export default function SiteScripts() {
         wmFill.style.opacity = '1';
       }
 
+      // ── Hero playable layer: shear, crosshair, click-to-stamp ──
+      const heroEl = document.getElementById('hero');
+      const finePtr = window.matchMedia('(pointer: fine)').matches;
+      if (heroEl && !prefersReduced) {
+        // Scroll-out kinetics — lines and annotations leave at different speeds
+        const heroMasks = document.querySelectorAll<HTMLElement>('.hero-headline .line-mask');
+        const annoLayer = document.getElementById('hero-annotation');
+        const sealEl = document.getElementById('hero-seal');
+        ScrollTrigger.create({
+          trigger: '#hero',
+          start: 'top top',
+          end: 'bottom top',
+          scrub: true,
+          onUpdate(self: { progress: number }) {
+            const p = self.progress;
+            const K = 120;
+            if (heroMasks[0]) gsap.set(heroMasks[0], { y: -K * p });
+            if (heroMasks[1]) gsap.set(heroMasks[1], { y: -K * 1.15 * p });
+            if (annoLayer) gsap.set(annoLayer, { y: -K * 0.85 * p });
+            if (sealEl) gsap.set(sealEl, { y: -K * 0.85 * p });
+          },
+        });
+
+        // Live crosshair — CAD canvas, lerped (desktop only)
+        if (finePtr) {
+          const xh = document.getElementById('hero-crosshair');
+          const xhV = document.getElementById('hero-xh-v');
+          const xhH = document.getElementById('hero-xh-h');
+          const xhR = document.getElementById('hero-xh-readout');
+          const headlineEl = document.getElementById('hero-headline');
+          let txc = 0, tyc = 0, cxc = 0, cyc = 0, measuring = false;
+          const onXhMove = (e: MouseEvent) => {
+            const r = heroEl.getBoundingClientRect();
+            txc = e.clientX - r.left;
+            tyc = e.clientY - r.top;
+          };
+          const onXhEnter = () => { if (xh) gsap.to(xh, { opacity: 1, duration: 0.2 }); };
+          const onXhLeave = () => { if (xh) gsap.to(xh, { opacity: 0, duration: 0.2 }); };
+          heroEl.addEventListener('mousemove', onXhMove);
+          heroEl.addEventListener('mouseenter', onXhEnter);
+          heroEl.addEventListener('mouseleave', onXhLeave);
+          if (headlineEl) {
+            headlineEl.addEventListener('mouseenter', () => { measuring = true; });
+            headlineEl.addEventListener('mouseleave', () => { measuring = false; });
+          }
+          const pad4 = (n: number) => String(Math.max(0, Math.round(n))).padStart(4, '0');
+          const xhTick = () => {
+            cxc += (txc - cxc) * 0.12;
+            cyc += (tyc - cyc) * 0.12;
+            if (xhV) gsap.set(xhV, { x: cxc });
+            if (xhH) gsap.set(xhH, { y: cyc });
+            if (xhR) {
+              gsap.set(xhR, { x: cxc + 14, y: cyc + 14 });
+              xhR.textContent = measuring
+                ? 'MEASURING…'
+                : `X ${pad4(cxc)} · Y ${pad4(cyc)} · UNVERIFIED`;
+            }
+          };
+          gsap.ticker.add(xhTick);
+          cleanups.push(() => {
+            gsap.ticker.remove(xhTick);
+            heroEl.removeEventListener('mousemove', onXhMove);
+            heroEl.removeEventListener('mouseenter', onXhEnter);
+            heroEl.removeEventListener('mouseleave', onXhLeave);
+          });
+        }
+
+        // Click-to-stamp — max 5 on screen, oldest fades after 4s
+        const stampsLayer = document.getElementById('hero-stamps');
+        const liveStamps: HTMLElement[] = [];
+        const STAMP_SVG =
+          '<svg viewBox="0 0 44 44">' +
+          '<circle cx="22" cy="22" r="21" fill="none" stroke="currentColor" stroke-width="1.1"/>' +
+          '<circle cx="22" cy="22" r="17.5" fill="none" stroke="currentColor" stroke-width="0.5"/>' +
+          '<text x="22" y="19" class="hero-stamp-check">✓</text>' +
+          '<text x="22" y="31" class="hero-stamp-word">MEASURED</text>' +
+          '</svg>';
+        const spawnStamp = (x: number, y: number) => {
+          if (!stampsLayer) return;
+          const el = document.createElement('div');
+          el.className = 'hero-stamp';
+          el.innerHTML = STAMP_SVG;
+          el.style.left = `${x - 22}px`;
+          el.style.top = `${y - 22}px`;
+          stampsLayer.appendChild(el);
+          gsap.fromTo(el,
+            { scale: 1.3, rotation: 2, opacity: 0 },
+            { scale: 1, rotation: 0, opacity: 1, duration: 0.35, ease: 'expo.out' }
+          );
+          liveStamps.push(el);
+          if (liveStamps.length > 5) {
+            const oldest = liveStamps.shift();
+            if (oldest) gsap.to(oldest, { opacity: 0, duration: 0.3, onComplete: () => oldest.remove() });
+          }
+          const tm = window.setTimeout(() => {
+            const k = liveStamps.indexOf(el);
+            if (k >= 0) liveStamps.splice(k, 1);
+            gsap.to(el, { opacity: 0, duration: 0.5, onComplete: () => el.remove() });
+          }, 4000);
+          timers.push(tm);
+        };
+        const onHeroClick = (e: MouseEvent) => {
+          const t = e.target as HTMLElement;
+          if (t.closest('a,button')) return;             // never intercept real controls
+          if (!finePtr && !t.closest('#hero-headline')) return; // touch: tap the headline
+          const r = heroEl.getBoundingClientRect();
+          spawnStamp(e.clientX - r.left, e.clientY - r.top);
+        };
+        heroEl.addEventListener('click', onHeroClick);
+        cleanups.push(() => heroEl.removeEventListener('click', onHeroClick));
+      }
+
       // ── Magnetic buttons (nav pill + apply submit) ──────────────
       document.querySelectorAll<HTMLElement>('#nav-pill-cta, #apply-cta').forEach((btn) => {
         btn.addEventListener('mousemove', (e) => {
@@ -767,11 +879,12 @@ export default function SiteScripts() {
       timers.push(idleLoop);
 
       const isTouch = window.matchMedia('(pointer: coarse)').matches;
-      if (hero && annotation && !isTouch) {
+      const driftEl = document.getElementById('hero-annotation-drift') ?? annotation;
+      if (hero && driftEl && !isTouch) {
         const onMove = (e: MouseEvent) => {
           const dx = (e.clientX / window.innerWidth - 0.5) * 2;
           const dy = (e.clientY / window.innerHeight - 0.5) * 2;
-          gsap.to(annotation, { x: dx * 4, y: dy * 4, duration: 0.8, ease: 'power2.out' });
+          gsap.to(driftEl, { x: dx * 4, y: dy * 4, duration: 0.8, ease: 'power2.out' });
         };
         hero.addEventListener('mousemove', onMove);
         cleanups.push(() => hero.removeEventListener('mousemove', onMove));
