@@ -18,7 +18,7 @@ const FRAMEWORKS = [
 
 export default function FrameworkMarquee() {
   return (
-    <div className="framework-strip">
+    <div className="framework-strip" data-field="#F4EFE6">
       <div className="framework-label-col">
         <span className="framework-label">
           Built on the standards that matter

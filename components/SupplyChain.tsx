@@ -8,7 +8,7 @@ const STEPS = [
 
 export default function SupplyChain() {
   return (
-    <section className="chain-section" id="supply-chain">
+    <section className="chain-section" id="supply-chain" data-field="#F4EFE6">
       <div className="chain-inner">
         <span className="chain-eyebrow reveal">How The Score Is Built</span>
         <h2 className="chain-headline reveal">

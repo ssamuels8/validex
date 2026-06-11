@@ -5,7 +5,7 @@ import { ArrowDown } from 'lucide-react';
 
 export default function Hero() {
   return (
-    <section className="hero" id="hero">
+    <section className="hero" id="hero" data-field="#F4EFE6">
 
       {/* Warm radial glow */}
       <div className="hero-atmosphere" aria-hidden="true" />

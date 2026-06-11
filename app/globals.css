@@ -29,6 +29,8 @@ html, body, * {
   --moss:        #2E5E3E;  /* secondary green, hover states only */
   --moss-bright: #4A8A5E;  /* accent on dark surfaces (legibility) */
   --sage:        #DCE7DD;  /* pale green chip bg, sparingly */
+  --on-forest:   rgba(244,239,230,0.78);  /* body text on the forest field */
+  --line-forest: rgba(244,239,230,0.18);  /* hairlines on the forest field */
   --on-dark:     rgba(242,238,228,0.62);
   --on-light:    rgba(21,19,14,0.62);
   --line-dark:   rgba(242,238,228,0.12);
@@ -120,6 +122,28 @@ h1, h2, h3, h4, h5, h6 {
   .chain-card, .sc-reveal { opacity: 1 !important; transform: none !important; }
   .chain-line path { stroke-dashoffset: 0 !important; }
   .grade-letter { opacity: 1 !important; }
+}
+
+/* ── Colour-field choreography ───────────────────────────
+   With JS + motion allowed, the BODY carries the section colour and
+   crossfades as you scroll (GSAP morphs body background per [data-field]).
+   Sections go transparent so scrolling moves through colour fields.
+   Without JS or with reduced motion, sections keep their own solid fills. */
+body.field-mode .hero,
+body.field-mode .framework-strip,
+body.field-mode .manifesto,
+body.field-mode .problem-section,
+body.field-mode .chain-section,
+body.field-mode .cs-carousel-section,
+body.field-mode .system-section,
+body.field-mode .site-footer {
+  background: transparent;
+}
+/* Dark sections keep their centre glow as a translucent overlay */
+body.field-mode .who-section,
+body.field-mode .score,
+body.field-mode .apply-section {
+  background: radial-gradient(ellipse at 50% 35%, rgba(242, 238, 228, 0.045) 0%, transparent 65%);
 }
 
 /* ── Motion: .reveal ────────────────────────────────────── */
@@ -505,13 +529,13 @@ h1, h2, h3, h4, h5, h6 {
 /* ── Problem ────────────────────────────────────────────── */
 /* ── Market Failure ─────────────────────────────────────── */
 .problem-section {
-  background: var(--paper);
+  background: var(--forest);
   padding: clamp(14vh, 18vh, 20vh) 6vw;
   min-height: 88vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  border-top: 1px solid var(--line-light);
+  border-top: 1px solid var(--line-forest);
 }
 .problem-eyebrow {
   display: block;
@@ -520,7 +544,7 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 500;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--forest);
+  color: var(--paper);
   margin-bottom: clamp(2.5rem, 4vh, 4rem);
 }
 .problem-grid {
@@ -542,21 +566,21 @@ h1, h2, h3, h4, h5, h6 {
   font-size: clamp(7rem, 15vw, 15rem);
   letter-spacing: -0.04em;
   line-height: 0.88;
-  color: var(--ink);
+  color: var(--paper);
 }
 .problem-caption {
   font-size: 1rem;
   font-weight: 400;
   line-height: 1.6;
-  color: var(--on-light);
+  color: var(--on-forest);
   max-width: 40ch;
 }
 .problem-pull {
   font-size: clamp(1.5rem, 2.8vw, 2.6rem);
   font-weight: 500;
   line-height: 1.25;
-  color: var(--ink);
-  border-left: 2px solid var(--forest);
+  color: var(--paper);
+  border-left: 2px solid rgba(244,239,230,0.85);
   padding-left: clamp(1.5rem, 2.5vw, 2.5rem);
   font-feature-settings: "ss01";
   opacity: 0; /* GSAP reveals with y 30→0 on scroll-in */
@@ -988,10 +1012,10 @@ h1, h2, h3, h4, h5, h6 {
 
 /* ── System ─────────────────────────────────────────────── */
 .system-section {
-  background: var(--paper);
+  background: var(--forest);
   padding: clamp(14vh, 18vh, 20vh) 6vw;
   text-align: center;
-  border-top: 1px solid var(--line-light);
+  border-top: 1px solid var(--line-forest);
 }
 .system-inner { max-width: 900px; margin: 0 auto; }
 .system-eyebrow {
@@ -1000,7 +1024,7 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 500;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--forest);
+  color: var(--paper);
   margin-bottom: 2rem;
   font-family: var(--font-mono), 'DM Mono', monospace !important;
 }
@@ -1009,7 +1033,7 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 500;
   line-height: 0.98;
   letter-spacing: -0.03em;
-  color: var(--ink);
+  color: var(--paper);
   margin-bottom: 1.5rem;
   font-feature-settings: "ss01", "cv01";
 }
@@ -1017,7 +1041,7 @@ h1, h2, h3, h4, h5, h6 {
   font-size: var(--body);
   font-weight: 400;
   line-height: 1.6;
-  color: var(--on-light);
+  color: var(--on-forest);
   max-width: 52ch;
   margin: 0 auto 5rem;
 }
@@ -1028,7 +1052,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 .system-diagram svg { width: 100%; height: auto; overflow: visible; }
 .diagram-line {
-  stroke: var(--line-light);
+  stroke: var(--line-forest);
   stroke-width: 1;
   fill: none;
   stroke-dasharray: 300;
@@ -1045,22 +1069,22 @@ h1, h2, h3, h4, h5, h6 {
   cursor: pointer;
 }
 .diagram-node.visible { opacity: 1; transform: scale(1); }
-.diagram-node:hover .diagram-node-circle { fill: var(--moss); stroke: var(--moss); }
-.diagram-node-circle { fill: var(--paper); stroke: var(--line-light); stroke-width: 1; transition: fill 0.2s, stroke 0.2s; }
-.diagram-center-circle { fill: var(--ink); }
+.diagram-node:hover .diagram-node-circle { fill: rgba(244,239,230,0.14); stroke: var(--paper); }
+.diagram-node-circle { fill: transparent; stroke: rgba(244,239,230,0.45); stroke-width: 1; transition: fill 0.2s, stroke 0.2s; }
+.diagram-center-circle { fill: var(--paper); }
 .diagram-label {
   font-size: 0.58rem;
   font-weight: 500;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  fill: var(--ink);
+  fill: var(--paper);
   text-anchor: middle;
   dominant-baseline: central;
   font-family: var(--font-mono), 'DM Mono', monospace;
 }
-.diagram-center-label { fill: var(--paper); font-size: 0.52rem; font-weight: 500; }
-.diagram-id-label { fill: var(--forest); font-size: 0.5rem; }
-.diagram-name-label { font-size: 0.56rem; fill: var(--ink); }
+.diagram-center-label { fill: var(--ink); font-size: 0.52rem; font-weight: 500; }
+.diagram-id-label { fill: rgba(244,239,230,0.85); font-size: 0.5rem; }
+.diagram-name-label { font-size: 0.56rem; fill: var(--paper); }
 .system-footnote {
   margin-top: 3rem;
   font-family: var(--font-mono), 'DM Mono', monospace !important;
@@ -1068,7 +1092,7 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 500;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--on-light);
+  color: var(--on-forest);
 }
 
 /* ── Score ──────────────────────────────────────────────── */

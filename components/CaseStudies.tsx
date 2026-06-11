@@ -87,7 +87,7 @@ export default function CaseStudies() {
   const scrollTo  = useCallback((i: number) => emblaApi?.scrollTo(i), [emblaApi]);
 
   return (
-    <section className="cs-carousel-section" id="case-studies">
+    <section className="cs-carousel-section" id="case-studies" data-field="#F4EFE6">
       {/* Header */}
       <div className="cs-carousel-header">
         <div className="cs-carousel-header-left">

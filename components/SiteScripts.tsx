@@ -70,6 +70,48 @@ export default function SiteScripts() {
         }, 16);
       }
 
+      // ── Colour-field morph: body bg crossfades between section fields ──
+      const fieldSections = document.querySelectorAll<HTMLElement>('[data-field]');
+      if (fieldSections.length && !prefersReduced) {
+        document.body.classList.add('field-mode');
+        fieldSections.forEach((sec) => {
+          ScrollTrigger.create({
+            trigger: sec,
+            start: 'top 55%',
+            end: 'bottom 55%',
+            onToggle(self: { isActive: boolean }) {
+              if (self.isActive) {
+                gsap.to(document.body, {
+                  backgroundColor: sec.dataset.field,
+                  duration: 0.6,
+                  ease: 'power1.inOut',   // ≈ --ease-ui
+                  overwrite: 'auto',
+                });
+              }
+            },
+          });
+        });
+      }
+
+      // ── Velocity marquee: speed + skew react to scroll velocity ──
+      // Skew goes on the wrapper column — the track's own CSS keyframe animation
+      // owns its transform, so an inline GSAP skew there would be overridden.
+      const mqTrack = document.querySelector<HTMLElement>('.framework-slider-col [style*="infiniteSlide"]');
+      const mqCol = document.querySelector<HTMLElement>('.framework-slider-col');
+      if (mqTrack && mqCol && !prefersReduced) {
+        let mqVel = 0;
+        const skewTo = gsap.quickTo(mqCol, 'skewX', { duration: 0.4, ease: 'power2.out' });
+        if (lenis) lenis.on('scroll', (e: { velocity: number }) => { mqVel = e.velocity; });
+        const mqTick = () => {
+          skewTo(Math.max(-6, Math.min(6, mqVel * 0.45)));
+          const anims = mqTrack.getAnimations ? mqTrack.getAnimations() : [];
+          if (anims[0]) anims[0].playbackRate = 1 + Math.min(Math.abs(mqVel) / 12, 2.5);
+          mqVel *= 0.9; // settle back on idle
+        };
+        gsap.ticker.add(mqTick);
+        cleanups.push(() => gsap.ticker.remove(mqTick));
+      }
+
       // ── General .reveal scroll-trigger ──────────────────────
       if (!prefersReduced) {
         document.querySelectorAll<HTMLElement>('.reveal').forEach((el) => {

@@ -39,7 +39,7 @@ const nodes = COMPONENTS.map((comp, i) => {
 
 export default function System() {
   return (
-    <section className="system-section" id="system">
+    <section className="system-section" id="system" data-field="#1A4D33">
       <div className="system-inner">
         <span className="system-eyebrow reveal">The System</span>
         <h2 className="system-headline reveal">Ten components. One verifiable grade.</h2>

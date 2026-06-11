@@ -1,6 +1,6 @@
 export default function Footer() {
   return (
-    <footer className="site-footer">
+    <footer className="site-footer" data-field="#15130E">
       {/* The finale — outlined wordmark spanning the band */}
       <span className="footer-wordmark reveal" aria-hidden="true">Validex.</span>
       <div className="footer-meta">

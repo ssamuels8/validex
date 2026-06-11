@@ -1,6 +1,6 @@
 export default function WhoWeAre() {
   return (
-    <section className="who-section" id="who-we-are">
+    <section className="who-section" id="who-we-are" data-field="#15130E">
       <div className="who-inner">
         <span className="who-eyebrow reveal">§ 01 — Who We Are</span>
         <h2 className="who-headline reveal">

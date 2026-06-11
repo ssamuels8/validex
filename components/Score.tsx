@@ -8,7 +8,7 @@ const BARS = [
 
 export default function Score() {
   return (
-    <section className="score" id="score">
+    <section className="score" id="score" data-field="#15130E">
       <div className="score-inner">
         <div className="score-cols">
           <div className="score-left">
